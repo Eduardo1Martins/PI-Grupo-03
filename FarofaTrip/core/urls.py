@@ -5,4 +5,5 @@ from . import views
 urlpatterns = [
     path('', views.aplication),
     path('cadastro', views.cadastro),
+    path('index', views.index),
  ]

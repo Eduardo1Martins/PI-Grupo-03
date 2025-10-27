@@ -5,3 +5,6 @@ def aplication(request):
 
 def cadastro(request):
     return render(request, 'cadastro.html')
+
+def index(request):
+    return render(request, 'index.html')
