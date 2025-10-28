@@ -8,3 +8,9 @@ def cadastro(request):
 
 def index(request):
     return render(request, 'index.html')
+
+def acesso(request):
+    return render(request, 'embarque.html')
+
+def sobre(request):
+    return render(request, 'sobre.html')
