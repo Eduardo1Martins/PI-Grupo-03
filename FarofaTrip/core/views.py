@@ -1,16 +1,14 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import Usuario, Evento
+from .serializers import UsuarioSerializer, EventoSerializer
 
-def aplication(request):
-    return render(request, 'login.html')
 
-def cadastro(request):
-    return render(request, 'cadastro.html')
+# View USERS
 
-def index(request):
-    return render(request, 'index.html')
+class UsuarioViewSet(viewsets.ModelViewSet):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
 
-def acesso(request):
-    return render(request, 'embarque.html')
-
-def sobre(request):
-    return render(request, 'sobre.html')
+class EventoViewSet(viewsets.ModelViewSet):
+    queryset = Evento.objects.all()
+    serializer_class = EventoSerializer

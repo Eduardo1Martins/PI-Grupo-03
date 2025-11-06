@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -6,14 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tela Inicial</title>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  
   <style>
     body {
       font-family: "DM Sans", sans-serif;
@@ -59,34 +55,42 @@
 <body>
   <body class="bg-black text-white">
 
-  <!-- Navbar -->
-<nav class="navbar navbar-dark" style="background-color: #24D301;">
+ <nav class="navbar navbar-dark" style="background-color: #24D301;">
   <div class="container-fluid d-flex justify-content-between align-items-center ms-1 me-1">
-    <!-- Botão toggler -->
+
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral" aria-controls="menuLateral">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Logo -->
     <a class="navbar-brand fw-bold text-dark" href="#">
-      <img src="{% static 'img/logo.png' %}" alt="Logo" height="30">
+      <img src="./assets/img/logo.png" alt="Logo" height="30">
     </a>
 
-    <!-- Ícone de perfil -->
-    <i class="bi bi-person-circle fs-2 text-dark"></i>
-  </div>
+    <div class="d-flex align-items-center gap-3">
+  <a href="carrinho.html" class="text-dark position-relative" aria-label="Abrir carrinho">
+    <i class="bi bi-cart3 fs-2"></i>
+    <span id="cart-count-badge"
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          style="display:none; font-size:.7rem; min-width:1.1rem; height:1.1rem; padding:0; line-height:1.1rem;">
+      0
+    </span>
+  </a>
+  <a href="conta.html" class="text-dark" aria-label="Minha conta">
+    <i class="bi bi-person-circle fs-2"></i>
+  </a>
+</div>
 </nav>
 
-<!-- MENU LATERAL -->
 <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="menuLateral" aria-labelledby="menuLateralLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="menuLateralLabel">Menu</h5>
+    <h2 class="offcanvas-title" id="menuLateralLabel">Menu</h2>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
   </div>
+  <div class="menu-divider"></div>
   <div class="offcanvas-body">
     <ul class="list-unstyled">
-      <li><a href="#" class="text-white text-decoration-none d-block py-2">Eventos</a></li>
-      <li><a href="#" class="text-white text-decoration-none d-block py-2">Sobre Nós</a></li>
+      <li><a href="index.html" class="text-white text-decoration-none d-block py-2">Eventos</a></li>
+      <li><a href="sobre.html" class="text-white text-decoration-none d-block py-2">Sobre Nós</a></li>
       <li><a href="#" class="text-white text-decoration-none d-block py-2">Conta</a></li>
       <li><a href="#" class="text-white text-decoration-none d-block py-2">Sair</a></li>
     </ul>
@@ -112,8 +116,42 @@
             </p>
             <p>Gratidão por cada um que confia na gente e no nosso trampo. Que possamos curtir muitas festas pela frente!</p>
     </div>
-
 </section>
+
+<script>
+(function () {
+  const CART_KEY = 'cart:v1';
+  const badgeEl = document.getElementById('cart-count-badge');
+  if (!badgeEl) return;
+
+  function getCount() {
+    try {
+      const state = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}');
+      return (state.items || []).reduce((sum, it) => sum + (parseInt(it.qty, 10) || 0), 0);
+    } catch { return 0; }
+  }
+
+  function renderBadge() {
+    const n = getCount();
+    badgeEl.textContent = n;
+    badgeEl.style.display = n > 0 ? 'inline-block' : 'none';
+  }
+
+  renderBadge();
+  window.addEventListener('storage', (e) => { if (e.key === CART_KEY) renderBadge(); });
+
+  if (window.CartStore && typeof window.CartStore.save === 'function') {
+    const originalSave = window.CartStore.save.bind(window.CartStore);
+    window.CartStore.save = function (state) {
+      const r = originalSave(state);
+      renderBadge();
+      return r;
+    };
+  }
+
+  window.updateCartCountBadge = renderBadge;
+})();
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

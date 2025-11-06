@@ -1,11 +1,8 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
+from .views import UsuarioViewSet, EventoViewSet
 
-from . import views
+router = DefaultRouter()
+router.register(r'usuarios', UsuarioViewSet, basename='usuario')
+router.register(r'eventos', EventoViewSet, basename='evento')
 
-urlpatterns = [
-    path('', views.aplication),
-    path('cadastro', views.cadastro),
-    path('index', views.index),
-    path('acesso', views.acesso),
-    path('sobre',views.sobre )
- ]
+urlpatterns = router.urls
