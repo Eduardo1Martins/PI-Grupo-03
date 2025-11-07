@@ -4,4 +4,4 @@ from django.apps import AppConfig
 class CoreConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'core'
-    verbose_name = 'Controle de Usários'
+    verbose_name = 'Adminstração Geral'

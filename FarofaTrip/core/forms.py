@@ -26,9 +26,9 @@ class UsuarioForm(forms.ModelForm):
             raise forms.ValidationError("O CPF deve estar no formato 000.000.000-00.")
         return cpf
     
-    def clean_fone(self):
+    def clean_telefone(self):
         telefone = self.cleaned_data.get('telefone')
-        if len(telefone) != 11:
+        if len(telefone) != 15:
             raise forms.ValidationError("O telefone deve estar no formato (00) 00000-0000.")
         return telefone
     
