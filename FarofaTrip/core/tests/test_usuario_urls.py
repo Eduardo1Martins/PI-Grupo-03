@@ -4,7 +4,7 @@ from core.views import UsuarioViewSet
 
 class TestUsuarioURLs(SimpleTestCase):
     def test_url_list_existe(self):
-        url = reverse('usuario-list')  # nome da rota gerado pelo router
+        url = reverse('usuario-list')  
         resolver = resolve(url)
         self.assertEqual(resolver.func.cls, UsuarioViewSet)
         

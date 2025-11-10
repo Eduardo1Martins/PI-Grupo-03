@@ -19,7 +19,7 @@ class UsuarioFormTest(TestCase):
         """CPF com tamanho incorreto deve falhar"""
         form_data = {
             'nome': 'Maria',
-            'cpf': '12345678900',  # sem pontos e traço
+            'cpf': '12345678900', 
             'telefone': '(11) 99999-9999',
             'endereco': 'Rua B, 45'
         }
@@ -33,7 +33,7 @@ class UsuarioFormTest(TestCase):
         form_data = {
             'nome': 'Carlos',
             'cpf': '111.222.333-44',
-            'telefone': '123',  # muito curto, 3 caracteres
+            'telefone': '123',
             'endereco': 'Rua Teste'
         }
         form = UsuarioForm(data=form_data)

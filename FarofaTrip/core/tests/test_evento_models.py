@@ -16,7 +16,6 @@ class EventoModelTest(TestCase):
             preco=Decimal("199.90")
         )
 
-        # Testa se foi criado
         self.assertEqual(Evento.objects.count(), 1)
         self.assertEqual(evento.nome, "Show do Legião Urbana")
         self.assertEqual(str(evento), "Show do Legião Urbana - São Paulo")

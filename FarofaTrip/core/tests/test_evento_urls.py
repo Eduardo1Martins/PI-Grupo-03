@@ -4,7 +4,7 @@ from core.views import EventoViewSet
 
 class TestEventoURLs(SimpleTestCase):
     def test_url_list_existe(self):
-        url = reverse('evento-list')  # nome da rota gerado pelo router
+        url = reverse('evento-list')
         resolver = resolve(url)
         self.assertEqual(resolver.func.cls, EventoViewSet)
         

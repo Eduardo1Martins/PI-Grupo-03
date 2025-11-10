@@ -1,7 +1,58 @@
 from django import forms
-from .models import Usuario
-from .models import Evento
+from .models import Usuario, Evento
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
+class LoginForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('email', 'password')
+        labels = {
+            'email': 'E-Mail:',
+            'password': 'Senha:',
+        }
+        widgets = {
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Digite seu e-mail'
+            }),
+            'password': forms.PasswordInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Digite sua senha'
+            }),
+        }
+        error_messages = {
+            'email': {
+                'required': ("Informe o e-mail."),
+            },
+        }
+
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip().lower()
+        if not email:
+            raise ValidationError('Informe o e-mail.')
+        self.cleaned_data['email'] = email
+        return email
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        password = cleaned_data.get('password')
+
+        if email and password:
+            try:
+                user_obj = User.objects.get(email__iexact=email)
+            except User.DoesNotExist:
+                raise ValidationError("Usuário com esse e-mail não encontrado.")
+            except User.MultipleObjectsReturned:
+                raise ValidationError("Há mais de um usuário com este e-mail. Contate o suporte.")
+
+            user = authenticate(username=user_obj.username, password=password)
+            if user is None:
+                raise ValidationError("Senha incorreta para o e-mail informado.")
+
+            self.user = user
 
 class UsuarioForm(forms.ModelForm):
     class Meta:
