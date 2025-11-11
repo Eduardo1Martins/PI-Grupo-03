@@ -1,199 +1,255 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <title>Acesse sua conta</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+  <title>Cadastre-se</title>
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-  body {
-    background-color: #000;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 90vh;
-    font-family: "DM Sans", sans-serif;
-  }
-
-  .login-card {
-    width: 100%;
-    max-width: 360px;
-    padding: 1.5rem;
-    background-color: #000;
-  }
-
-  .login-card img {
-    width: 90px;
-    display: block;
-    margin: 0 auto 1rem;
-  }
-
-  .form-control {
-    background-color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-  }
-
-  .form-control:focus {
-    box-shadow: none;
-    border: 2px solid #00FF84;
-  }
-
-  .btn-login {
-    background-color: #24D301;
-    color: #000;
-    font-weight: 600;
-    border-radius: 8px;
-    margin-top: 0.5rem;
-    padding: 0.5rem;
-  }
-
-  .btn-login:hover {
-    background-color: #28ee00;
-    color: #000;
-  }
-
-  .div-google {
-  margin-top: 0;
-}
-
-  .google-btn {
-    background-color: #fff;
-    color: #000;
-    font-weight: 500;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    padding: 0.65rem 1rem;
-  }
-
-  .google-btn img {
-    width: 20px;
-    height: 20px;
-    margin: 0;
-
-  }
-
-  .forgot-password a {
-    color: #fff;
-    text-decoration: underline;
-    font-family: "Inter", sans-serif;
-  }
-
-   .forgot-password p {
-    color: #B9B9B9;
-    font-family: "Inter", sans-serif;
-  }
-
-  .divider {
-  height: 1px;
-  background-color: #333;
-  margin: 2.5rem 0 2.5rem 0;
-}
-
-  .forgot-password {
-    text-align: center;
-    margin: 1rem;
-  }
-</style>
-
+    body {
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: "DM Sans", sans-serif;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 1.5rem;
+      background-color: #000;
+    }
+    .login-card img {
+      width: 90px;
+      display: block;
+      margin: 0 auto 1rem;
+    }
+    .form-control {
+      background-color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+    }
+    .form-control:focus { box-shadow: none; border: 2px solid #00ff84; }
+    .btn-login {
+      background-color: #24d301;
+      color: #000;
+      font-weight: 600;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      padding: 0.6rem;
+    }
+    .btn-login:hover { background-color: #28ee00; color: #000; }
+    .google-btn {
+      background-color: #fff;
+      color: #000;
+      font-weight: 500;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 0.65rem 1rem;
+    }
+    .google-btn img { width: 20px; height: 20px; margin: 0; }
+    .divider { height: 1px; background-color: #333; margin: 2rem 0; }
+    .forgot-password { text-align: center; margin: 1rem; }
+    .forgot-password a { color: #fff; text-decoration: underline; font-family: "Inter", sans-serif; }
+    .forgot-password p { color: #b9b9b9; font-family: "Inter", sans-serif; }
+    .is-invalid { border: 2px solid #ff4d4f !important; }
+  </style>
 </head>
 <body>
-
   <div class="login-card text-center">
-    <img src="./assets/img/nave.png" alt="Logo">
+    <img src="./assets/img/nave.png" alt="Logo" />
+    <h4 class="mb-4">Cadastre-se</h4>
 
-    <h4 class="mb-5">Cadastre-se</h4>
+    <!-- Alertas -->
+    <div id="formAlert" class="alert d-none" role="alert"></div>
 
-    <form method="post">
-      <div class="mb-3">
-        <input type="email" class="form-control" placeholder="E-mail" required>
+    <form id="registerForm" novalidate>
+      <div class="mb-3 text-start">
+        <label for="email" class="form-label">E-mail</label>
+        <input id="email" name="email" type="email" class="form-control" placeholder="seu@email.com" required />
       </div>
-      <div class="mb-3">
-        <input id="cpf" type="text" class="form-control" placeholder="CPF" required>
+
+      <div class="mb-3 text-start">
+        <label for="nome" class="form-label">Nome completo (opcional)</label>
+        <input id="nome" name="nome" type="text" class="form-control" placeholder="Seu nome" />
       </div>
-      <div class="mb-3">
-        <input id="telefone" type="tel" class="form-control" placeholder="Telefone" pattern="(\d{2})\s?\d{4,5}-\d{4}" required>
+
+      <div class="mb-3 text-start">
+        <label for="cpf" class="form-label">CPF</label>
+        <input id="cpf" name="cpf" type="text" class="form-control" placeholder="000.000.000-00" required />
       </div>
-      <div class="mb-4">
-        <input type="password" class="form-control" placeholder="Senha" required>
+
+      <div class="mb-3 text-start">
+        <label for="telefone" class="form-label">Telefone</label>
+        <input id="telefone" name="telefone" type="tel" class="form-control" placeholder="(11) 99999-9999" required />
       </div>
-      <button type="submit" class="btn btn-login w-50">Cadastrar</button>
+
+      <div class="mb-4 text-start">
+        <label for="password" class="form-label">Senha</label>
+        <input id="password" name="password" type="password" class="form-control" placeholder="••••••••" required />
+      </div>
+
+      <button id="submitBtn" type="submit" class="btn btn-login w-100">Cadastrar</button>
     </form>
 
     <div class="divider"></div>
 
-    <div class="div-google">
-    <button class="btn google-btn w-100 mb-4">
-  <img src="./assets/img/Google-logo.png" alt="Google">
-  <span>Continuar com o Google</span>
-</button>
-</div>
-<div class="forgot-password">
-    <p>Já possui uma conta?<br> <a href="login.html">Entrar</a></p>
+    <button class="btn google-btn w-100 mb-3" type="button" disabled title="Em breve">
+      <img src="./assets/img/Google-logo.png" alt="Google" />
+      <span>Continuar com o Google</span>
+    </button>
+
+    <div class="forgot-password">
+      <p>Já possui uma conta?<br /><a href="login.html">Entrar</a></p>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  
   <script>
-    //Formatação automática do CPF
-  const cpfInput = document.getElementById('cpf');
 
-cpfInput.addEventListener('input', function (event) {
-  let value = event.target.value.replace(/\D/g, '');
-  
-  if (value.length > 11) {
-    value = value.slice(0, 11);
-  }
+    const API_BASE = window.API_BASE || "http://localhost:8000/api";
 
-  if (value.length > 9) {
-    value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
-  } else if (value.length > 6) {
-    value = value.replace(/^(\d{3})(\d{3})(\d{3}).*/, '$1.$2.$3');
-  } else if (value.length > 3) {
-    value = value.replace(/^(\d{3})(\d{3}).*/, '$1.$2');
-  }
+    const $ = (sel) => document.querySelector(sel);
+    const alertBox = $("#formAlert");
+    const form = $("#registerForm");
+    const submitBtn = $("#submitBtn");
 
-  event.target.value = value;
-});
-
-//Formatação automática do Telefone
-const telefoneInput = document.getElementById('telefone');
-
-  telefoneInput.addEventListener('input', function (event) {
-    let value = event.target.value.replace(/\D/g, '');
-
-    if (value.length > 11) value = value.slice(0, 11);
-
-    if (value.length > 10) {
-      value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+    function showAlert(message, type = "danger") {
+      alertBox.className = `alert alert-${type}`;
+      alertBox.textContent = message;
+      alertBox.classList.remove("d-none");
     }
-    else if (value.length > 6) {
-      value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-    }
-    else if (value.length > 2) {
-      value = value.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
-    }
-    else {
-      value = value.replace(/^(\d*)/, '($1');
+    function clearAlert() {
+      alertBox.className = "alert d-none";
+      alertBox.textContent = "";
     }
 
-    event.target.value = value;
-  });
-</script>
-  
+    function setLoading(loading) {
+      submitBtn.disabled = loading;
+      submitBtn.textContent = loading ? "Cadastrando…" : "Cadastrar";
+    }
+
+    // ====== Máscaras simples (CPF/telefone) ======
+    const cpfInput = $("#cpf");
+    cpfInput.addEventListener("input", (e) => {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length > 11) v = v.slice(0, 11);
+      if (v.length > 9) v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, "$1.$2.$3-$4");
+      else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{0,3}).*/, "$1.$2.$3");
+      else if (v.length > 3) v = v.replace(/^(\d{3})(\d{0,3}).*/, "$1.$2");
+      e.target.value = v;
+    });
+
+    const telInput = $("#telefone");
+    telInput.addEventListener("input", (e) => {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length > 11) v = v.slice(0, 11);
+      if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
+      else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+      else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5}).*/, "($1) $2");
+      else v = v.replace(/^(\d*)/, "($1");
+      e.target.value = v;
+    });
+
+    // ====== CSRF (só se necessário em mesmo domínio) ======
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    }
+
+    // ====== Submissão ======
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearAlert();
+
+      // Campos
+      const email = $("#email");
+      const password = $("#password");
+      const nome = $("#nome");
+      const cpf = $("#cpf");
+      const telefone = $("#telefone");
+
+      // Reset de erros visuais
+      [email, password, cpf, telefone].forEach((el) => el.classList.remove("is-invalid"));
+
+      // Validações mínimas no client
+      if (!email.value || !email.validity.valid) { email.classList.add("is-invalid"); return showAlert("Informe um e-mail válido."); }
+      if (!password.value || password.value.length < 6) { password.classList.add("is-invalid"); return showAlert("Senha deve ter pelo menos 6 caracteres."); }
+      if (!cpf.value || cpf.value.replace(/\D/g, "").length !== 11) { cpf.classList.add("is-invalid"); return showAlert("Informe um CPF válido (11 dígitos)."); }
+      if (!telefone.value || telefone.value.replace(/\D/g, "").length < 10) { telefone.classList.add("is-invalid"); return showAlert("Informe um telefone válido."); }
+
+      const payload = {
+        email: email.value.trim().toLowerCase(),
+        password: password.value,
+        nome: nome.value.trim() || undefined,
+        cpf: cpf.value.trim(),
+        telefone: telefone.value.trim(),
+      };
+
+      setLoading(true);
+      try {
+        const headers = { "Content-Type": "application/json" };
+        // inclui CSRF se for mesma origem e o cookie existir
+        try {
+          const sameOrigin = location.origin.includes("localhost:8000") || location.origin === new URL(API_BASE).origin;
+          const csrftoken = getCookie("csrftoken");
+          if (sameOrigin && csrftoken) headers["X-CSRFToken"] = csrftoken;
+        } catch (_) {}
+
+        const res = await fetch(`${API_BASE}/auth/register/`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          // Mostra mensagens de erro por campo (DRF) ou gerais
+          if (data && typeof data === "object") {
+            const fieldOrder = ["email", "password", "cpf", "telefone", "non_field_errors", "detail"]; 
+            for (const f of fieldOrder) {
+              if (data[f]) {
+                if ($("#" + f)) $("#" + f).classList.add("is-invalid");
+                const msg = Array.isArray(data[f]) ? data[f][0] : String(data[f]);
+                showAlert(msg || "Erro ao registrar.");
+                break;
+              }
+            }
+            if (!alertBox.textContent) showAlert("Não foi possível concluir o cadastro.");
+          } else {
+            showAlert("Erro inesperado ao registrar.");
+          }
+          return;
+        }
+
+        // Sucesso: guarda tokens e prossegue
+        if (data.access) localStorage.setItem("access", data.access);
+        if (data.refresh) localStorage.setItem("refresh", data.refresh);
+
+        showAlert("Cadastro realizado com sucesso! Redirecionando…", "success");
+        // redireciona após 1.2s (ajuste conforme sua rota pós-login)
+        setTimeout(() => {
+          window.location.href = "index.html"; // altere para a página inicial do app logado
+        }, 1200);
+      } catch (err) {
+        console.error(err);
+        showAlert("Falha de conexão com o servidor.");
+      } finally {
+        setLoading(false);
+      }
+    });
+  </script>
 </body>
 </html>
