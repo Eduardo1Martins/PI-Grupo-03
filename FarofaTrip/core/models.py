@@ -1,16 +1,23 @@
 import uuid
 from decimal import Decimal
 from django.db import models
+from django.conf import settings
 
 
-class Usuario(models.Model):
-    nome = models.CharField(max_length=100)
-    cpf = models.CharField(max_length=14, unique=True)
+class Perfil(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="perfil"
+    )
+    cpf = models.CharField(max_length=14, unique=True, null=False, blank=False, db_index=True)
     telefone = models.CharField(max_length=15, blank=True, null=True)
     endereco = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.nome} ({self.cpf})"
+        u = self.user
+        nome = (u.get_full_name() or u.username or u.email or f"User {u.id}")
+        return f"{nome} ({self.cpf})"
 
 
 class Evento(models.Model):

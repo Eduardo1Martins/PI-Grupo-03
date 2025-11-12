@@ -1,76 +1,65 @@
-from rest_framework import serializers
-from .models import Usuario
-from .models import Evento
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
+from .models import Perfil, Evento
 
 User = get_user_model()
 
-class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
-    email = serializers.EmailField(required=False)  
-    password = serializers.CharField(write_only=True, trim_whitespace=False, required=False)
+class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
+    email = serializers.EmailField(required=False, allow_blank=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields.pop(self.username_field, None)
-        if "password" in self.fields:
-            self.fields["password"].required = False
+        self.fields[self.username_field].required = False
+        if hasattr(self.fields[self.username_field], "allow_blank"):
+            self.fields[self.username_field].allow_blank = True
 
     def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
+        username_field = self.username_field
+        username = attrs.get(username_field)
+        email = attrs.get("email")
 
-        if not email or not password:
-            raise serializers.ValidationError('E-mail e senha são obrigatórios.')
+        if not username and email:
+            try:
+                user = User.objects.get(email__iexact=email)
+                attrs[username_field] = getattr(user, username_field)
+            except User.DoesNotExist:
+                pass
 
-        try:
-            user = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError('E-mail não encontrado.')
-        except User.MultipleObjectsReturned:
-            raise serializers.ValidationError('Há mais de um usuário com este e-mail. Contate o suporte.')
+        return super().validate(attrs)
 
-        user_ok = authenticate(self.context.get('request'),
-                               username=user.get_username(),
-                               password=password)
-        if user_ok is None:
-            raise serializers.ValidationError('Credenciais inválidas.')
 
-        data = super().validate({'username': user_ok.get_username(), 'password': password})
-
-        data['user'] = {
-            'id': user_ok.id,
-            'username': user_ok.get_username(),
-            'email': user_ok.email,
-            'first_name': user_ok.first_name,
-            'last_name': user_ok.last_name,
-        }
-        return data
-    
 User = get_user_model()
 
-class RegisterSerializer(serializers.Serializer):
-    # Campos do auth.User
-    first_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
-    last_name  = serializers.CharField(required=False, allow_blank=True, max_length=150)
-    email      = serializers.EmailField()
-    password   = serializers.CharField(write_only=True, trim_whitespace=False)
+def split_nome(nome: str):
+    nome = " ".join((nome or "").strip().split())
+    if not nome:
+        return "", ""
+    partes = nome.split(" ")
+    if len(partes) == 1:
+        return partes[0], ""                
+    return partes[0], " ".join(partes[1:]) 
 
-    # Campos opcionais do domínio Usuario
-    nome     = serializers.CharField(required=False, allow_blank=True, max_length=100)
-    cpf      = serializers.CharField(required=False, allow_blank=True, max_length=14)
-    telefone = serializers.CharField(required=False, allow_blank=True, max_length=15)
-    endereco = serializers.CharField(required=False, allow_blank=True, max_length=255)
+class RegisterSerializer(serializers.Serializer):
+    
+    nome = serializers.CharField(required=False, allow_blank=True, write_only=True)
+
+    username = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=True)
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
+    password = serializers.CharField(write_only=True)
+
+    cpf = serializers.CharField(required=True, allow_blank=False)
+    telefone = serializers.CharField(required=False, allow_blank=True)
+    endereco = serializers.CharField(required=False, allow_blank=True)
 
     def validate_email(self, value):
-        email = (value or "").strip().lower()
-        if User.objects.filter(email__iexact=email).exists():
-            raise serializers.ValidationError("Já existe um usuário com este e-mail.")
-        return email
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("E-mail já cadastrado.")
+        return value
 
     def validate_password(self, value):
         validate_password(value)
@@ -78,42 +67,73 @@ class RegisterSerializer(serializers.Serializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        # separa campos do domínio "Usuario"
-        usuario_fields = {k: validated_data.pop(k, None) for k in ("nome", "cpf", "telefone", "endereco")}
-        password = validated_data.pop("password")
-        email = validated_data.pop("email").strip().lower()
+        nome = validated_data.pop("nome", "").strip()
+        if nome:
+            fn, ln = split_nome(nome)
+            validated_data.setdefault("first_name", fn)
+            validated_data.setdefault("last_name", ln)
 
-        # cria o usuário usando o e-mail como username
+        perfil_fields = {k: validated_data.pop(k) for k in ["cpf", "telefone", "endereco"] if k in validated_data}
+
+        username = validated_data.get("username") or validated_data["email"]
         user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password,
-            **validated_data  # first_name / last_name se enviados
+            username=username,
+            email=validated_data["email"],
+            first_name=validated_data.get("first_name", ""),
+            last_name=validated_data.get("last_name", ""),
+            password=validated_data["password"],
         )
 
-        # cria Usuario **somente** se CPF for informado (é unique e obrigatório no seu model)
-        from .models import Usuario
-        cpf = (usuario_fields.get("cpf") or "").strip()
-        if cpf:
-            nome = (usuario_fields.get("nome") or "").strip()
-            if not nome:
-                nome = f"{user.first_name} {user.last_name}".strip() or email
-            Usuario.objects.create(
-                nome=nome,
-                cpf=cpf,
-                telefone=(usuario_fields.get("telefone") or None),
-                endereco=(usuario_fields.get("endereco") or None),
-            )
-
+        Perfil.objects.update_or_create(
+            user=user,
+            defaults={
+                "cpf": perfil_fields.get("cpf"),
+                "telefone": perfil_fields.get("telefone") or None,
+                "endereco": perfil_fields.get("endereco") or None,
+            },
+        )
         return user
 
-class UsuarioSerializer(serializers.ModelSerializer):
+
+class PerfilSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="user.id", read_only=True)
+    username = serializers.CharField(source="user.username", required=False, allow_blank=True)
+    email = serializers.EmailField(source="user.email", required=False, allow_blank=True)
+    first_name = serializers.CharField(source="user.first_name", required=False, allow_blank=True)
+    last_name = serializers.CharField(source="user.last_name", required=False, allow_blank=True)
+
     class Meta:
-        model = Usuario
-        fields = '__all__'
+        model = Perfil
+        fields = [
+            "id", "username", "email", "first_name", "last_name",
+            "cpf", "telefone", "endereco",
+        ]
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user", {})
+        for attr, value in user_data.items():
+            setattr(instance.user, attr, value)
+        instance.user.save()
+        return super().update(instance, validated_data)
+
+    def create(self, validated_data):
+        user_data = validated_data.pop("user", {})
+        username = user_data.get("username") or user_data.get("email")
+        if not username:
+            raise serializers.ValidationError({"username": "username ou email é obrigatório."})
+
+        if "password" in user_data:
+            pwd = user_data.pop("password")
+        else:
+            from django.utils.crypto import get_random_string
+            pwd = get_random_string(12)
+
+        user = User.objects.create_user(password=pwd, **user_data, username=username)
+        perfil = Perfil.objects.create(user=user, **validated_data)
+        return perfil
 
 
 class EventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evento
-        fields = '__all__'
+        fields = "__all__"

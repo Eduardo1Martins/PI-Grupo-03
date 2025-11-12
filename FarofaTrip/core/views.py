@@ -1,54 +1,59 @@
-from rest_framework import viewsets
-from .models import Usuario, Evento
-from .serializers import UsuarioSerializer, EventoSerializer, RegisterSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
-from rest_framework.permissions import AllowAny
-from .serializers import EmailTokenObtainPairSerializer
-from rest_framework.views import APIView
+from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
-from rest_framework import status, permissions
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
+from .models import Perfil, Evento
+from .serializers import PerfilSerializer, EventoSerializer, RegisterSerializer, EmailOrUsernameTokenObtainPairSerializer
 
-
+# LOGIN
 class LoginView(TokenObtainPairView):
-    permission_classes = [AllowAny]
-    serializer_class = EmailTokenObtainPairSerializer
-
-
-class LogoutView(TokenBlacklistView):
+    serializer_class = EmailOrUsernameTokenObtainPairSerializer
     permission_classes = [AllowAny]
 
-
+# REFRESH padrão
 class RefreshView(TokenRefreshView):
     permission_classes = [AllowAny]
 
+# LOGOUT com blacklist
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
+    def post(self, request, *args, **kwargs):
+        try:
+            refresh = request.data.get("refresh")
+            if not refresh:
+                return Response({"detail": "refresh token é obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
+            token = RefreshToken(refresh)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+# REGISTER
 class RegisterView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
-    def post(self, request):
-        ser = RegisterSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        user = ser.save()
-
-        refresh = RefreshToken.for_user(user)
+    def post(self, request, *args, **kwargs):
+        s = RegisterSerializer(data=request.data)
+        s.is_valid(raise_exception=True)
+        user = s.save()
         return Response({
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
             "user": {
                 "id": user.id,
-                "username": user.get_username(),
+                "username": user.username,
                 "email": user.email,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
             }
         }, status=status.HTTP_201_CREATED)
 
-
 class UsuarioViewSet(viewsets.ModelViewSet):
-    queryset = Usuario.objects.all()
-    serializer_class = UsuarioSerializer
-
+    queryset = Perfil.objects.select_related("user").all()
+    serializer_class = PerfilSerializer
+    permission_classes = [permissions.AllowAny]
+    
 
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
