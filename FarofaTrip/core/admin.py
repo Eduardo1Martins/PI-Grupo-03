@@ -8,5 +8,5 @@ class PerfilAdmin(admin.ModelAdmin):
 
 @admin.register(Evento)
 class EventoAdmin(admin.ModelAdmin):
-    list_display = ("id", "nome", "cidade", "data", "preco")
+    list_display = ("id", "nome", "cidade", "data", "ingresso")
     search_fields = ("nome", "cidade",)

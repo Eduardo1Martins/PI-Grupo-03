@@ -95,7 +95,8 @@ class EventoForm(forms.ModelForm):
             'data': 'Data do evento:',
             'descricao': 'Descrição',
             'imagem': 'Imgagem',
-            'preco': 'Preço',
+            'ingresso': 'Preço do ingress0',
+            'excursao': 'Preço da excursão',
         }
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do evento'}),
@@ -104,5 +105,6 @@ class EventoForm(forms.ModelForm):
             'data': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'Data do evento'}),
             'descricao': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Decrição'}),
             'imagem': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Banner do evento'}),
-            'preco': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Preço do ingresso'}),
+            'ingresso': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Preço do ingresso'}),
+            'excursao': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Preço da excursão'}),
         }

@@ -29,7 +29,8 @@ class Evento(models.Model):
     data = models.DateField()
     descricao = models.CharField(max_length=250)
     imagem = models.ImageField(upload_to="eventos/", null=True, blank=True)
-    preco = models.DecimalField(max_digits=8, decimal_places=2)
+    ingresso = models.DecimalField(max_digits=8, decimal_places=2)
+    excursao = models.DecimalField(max_digits=8, decimal_places=2, default=0)
 
     def __str__(self):
         return self.nome
