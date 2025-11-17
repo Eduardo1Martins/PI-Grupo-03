@@ -253,103 +253,106 @@
 
 
   <script>
-    const eventos = {
-      "mandallah": {
-        nome: "Mandallah - 20 anos",
-        local: "Itirapina - SP",
-        data: "15/10",
-        imagem: "./assets/img/banner-Mandallah.png",
-        ingresso: { nome: "Ingresso Mandallah", preco: 180 },
-        excursao: { nome: "Excursão Mandallah", preco: 100 }
-      },
+  const API_BASE = 'http://localhost:8000/api';
 
-      "trance-legalize": {
-        nome: "Trance Legalize",
-        local: "Rio Claro - SP",
-        data: "02/11",
-        imagem: "./assets/img/banner-TranceLegalize.png",
-        ingresso: { nome: "Ingresso Trance Legalize", preco: 120 },
-        excursao: { nome: "Excursão Trance Legalize", preco: 80 }
-      },
+  // Se você usar JWT, pode recuperar o token daqui (ajuste conforme seu front)
+  function getToken() {
+    const candidates = ['token', 'access', 'jwt'];
+    for (const k of candidates) {
+      const v = localStorage.getItem(k);
+      if (v) return v;
+    }
+    return null;
+  }
 
-      "arvore-da-vida": {
-        nome: "Árvore da Vida",
-        local: "Itirapina - SP",
-        data: "15/11",
-        imagem: "./assets/img/banner-ArvoreDaVida.png",
-        ingresso: { nome: "Ingresso Árvore da Vida", preco: 150 },
-        excursao: { nome: "Excursão Árvore da Vida", preco: 95 }
-      },
+  const baseHeaders = { 'Accept': 'application/json' };
+  const jwt = getToken();
+  if (jwt) baseHeaders['Authorization'] = `Bearer ${jwt}`;
 
-      "psy-festival": {
-        nome: "PSY Festival",
-        local: "Sumaré - SP",
-        data: "03/12",
-        imagem: "./assets/img/banner-PSY.png",
-        ingresso: { nome: "Ingresso PSY Festival", preco: 150 },
-        excursao: { nome: "Excursão PSY Festival", preco: 95 }
-      },
+  function formatDateBR(iso) {
+    if (!iso) return '';
+    const [y, m, d] = String(iso).split('-');
+    if (!y || !m || !d) return iso;
+    return `${d}/${m}`;
+  }
 
-       "shanti-festival": {
-        nome: "Shanti Festival",
-        local: "Mariporã - SP",
-        data: "24/01",
-        imagem: "./assets/img/banner-ShantiFestival.png",
-        ingresso: { nome: "Ingresso Shanti Festival", preco: 150 },
-        excursao: { nome: "Excursão Shanti Festival", preco: 95 }
-      },
+  function formatMoneyBR(value) {
+    const n = Number(value) || 0;
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(n);
+  }
 
-      "shiva-shankar": {
-        nome: "Shiva Shankar",
-        local: "Rio Claro - SP",
-        data: "07/03",
-        imagem: "./assets/img/banner-ShivaShankar.png",
-        ingresso: { nome: "Ingresso Shiva Shankar", preco: 150 },
-        excursao: { nome: "Excursão Shiva Shankar", preco: 95 }
-      },
+  const params = new URLSearchParams(window.location.search);
+  const eventoId = params.get('evento');
 
-      "flor-da-vida": {
-        nome: "Flor da Vida",
-        local: "Itirapina - SP",
-        data: "21/03",
-        imagem: "./assets/img/banner-FlorDaVida.png",
-        ingresso: { nome: "Ingresso Flor da Vida", preco: 150 },
-        excursao: { nome: "Excursão Flor da Vida", preco: 95 }
-      },
+  if (!eventoId) {
+    document.body.innerHTML = "<h3 class='text-center mt-5'>Evento não encontrado.</h3>";
+  } else {
+    carregarEvento(eventoId);
+  }
 
-      "yanomami-festival": {
-        nome: "Yanomami Festival",
-        local: "Itirapina - SP",
-        data: "20/05",
-        imagem: "./assets/img/banner-YanomamiFestival.png",
-        ingresso: { nome: "Ingresso Yanomami Festival", preco: 150 },
-        excursao: { nome: "Excursão Yanomami Festival", preco: 95 }
-      },
-    };
+  async function carregarEvento(id) {
+    try {
+      const resp = await fetch(`${API_BASE}/eventos/${id}/`, {
+        headers: baseHeaders
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
-    const params = new URLSearchParams(window.location.search);
-    const eventoParam = params.get("evento");
+      const ev = await resp.json();
 
-    const evento = eventos[eventoParam];
+      // Mapeia a resposta da API para o objeto usado pelo resto da página
+      const evento = {
+        id: ev.id,
+        nome: ev.nome,
+        local: `${ev.cidade} - ${ev.local}`,
+        data: ev.data,        // 'YYYY-MM-DD'
+        imagem: ev.imagem,    // URL da imagem (ajuste se necessário)
+        ingresso: {
+          nome: `Ingresso ${ev.nome}`,
+          preco: Number(ev.ingresso)
+        },
+        excursao: {
+          nome: `Excursão ${ev.nome}`,
+          preco: Number(ev.excursao || 0)
+        }
+      };
 
-    if (evento) {
-      document.getElementById("evento-img").src = evento.imagem;
-      document.getElementById("nome-evento").textContent = evento.nome;
-      document.getElementById("local-evento").textContent = evento.local;
-      document.getElementById("data-evento").textContent = evento.data;
-      document.getElementById("nome-ingresso-evento").textContent = evento.ingresso.nome;
-      document.getElementById("preco-ingresso-evento").textContent = `R$${evento.ingresso.preco},00`;
-      document.getElementById("nome-excursao-evento").textContent = evento.excursao.nome;
-      document.getElementById("preco-excursao-evento").textContent = `R$${evento.excursao.preco},00`;
-      document.getElementById("preco-total").textContent = `R$${evento.ingresso.preco + evento.excursao.preco},00`;
-    } else {
+      // Deixa visível para o segundo <script>
+      window.evento = evento;
+      window.eventoParam = String(id);
+
+      preencherTela(evento);
+    } catch (err) {
+      console.error(err);
       document.body.innerHTML = "<h3 class='text-center mt-5'>Evento não encontrado.</h3>";
     }
-  </script>
+  }
 
-  <script>
+  function preencherTela(evento) {
+    const img = document.getElementById("evento-img");
+    if (img) img.src = evento.imagem || "./assets/img/placeholder.png";
+
+    document.getElementById("nome-evento").textContent = evento.nome;
+    document.getElementById("local-evento").textContent = evento.local;
+    document.getElementById("data-evento").textContent = formatDateBR(evento.data);
+
+    document.getElementById("nome-ingresso-evento").textContent = evento.ingresso.nome;
+    document.getElementById("preco-ingresso-evento").textContent = formatMoneyBR(evento.ingresso.preco);
+
+    document.getElementById("nome-excursao-evento").textContent = evento.excursao.nome;
+    document.getElementById("preco-excursao-evento").textContent = formatMoneyBR(evento.excursao.preco);
+
+    const total = (evento.ingresso.preco || 0) + (evento.excursao.preco || 0);
+    document.getElementById("preco-total").textContent = formatMoneyBR(total);
+  }
+</script>
+
+
+
+<script>
   const CART_KEY = 'cart:v1';
-
   const money = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const CartStore = {
@@ -359,6 +362,7 @@
     },
     save(state) {
       state.updatedAt = new Date().toISOString();
+      state.total = calcTotal(state.items);
       localStorage.setItem(CART_KEY, JSON.stringify(state));
     },
     clear() {
@@ -367,7 +371,9 @@
   };
 
   function calcTotal(items) {
-    return items.reduce((acc, it) => acc + (it.unitPrice * it.qty), 0);
+    return items.reduce((acc, it) => {
+      return acc + (Number(it.unitPrice || 0) * Number(it.qty || 0));
+    }, 0);
   }
 
   const sections = document.querySelectorAll('.card-section');
@@ -375,8 +381,10 @@
   const excursaoSection  = sections[1];
 
   function setupCounter(section) {
+    if (!section) return;
     const btns = section.querySelectorAll('.counter button');
     const qtySpan = section.querySelector('.counter span');
+    if (!btns.length || !qtySpan) return;
 
     function setQty(n) {
       const v = Math.max(0, n);
@@ -394,98 +402,83 @@
   const totalSpan = document.getElementById('preco-total');
 
   function getQty(section) {
-    return parseInt(section.querySelector('.counter span').textContent, 10);
+    if (!section) return 0;
+    const span = section.querySelector('.counter span');
+    return span ? (parseInt(span.textContent, 10) || 0) : 0;
   }
 
   function updateTotal() {
+    if (!window.evento) return;
+    const ev = window.evento;
+
     const qIngress = getQty(ingressoSection);
     const qExcurs  = getQty(excursaoSection);
-    const total = (evento.ingresso.preco * qIngress) + (evento.excursao.preco * qExcurs);
-    totalSpan.textContent = money.format(total);
+
+    const total = (ev.ingresso.preco * qIngress) + (ev.excursao.preco * qExcurs);
+    if (totalSpan) totalSpan.textContent = money.format(total);
   }
+
   updateTotal();
 
-  document.querySelector('.btn.btn-cart').addEventListener('click', () => {
-    const qIngress = getQty(ingressoSection);
-    const qExcurs  = getQty(excursaoSection);
+  const btnCart = document.querySelector('.btn.btn-cart');
+  if (btnCart) {
+    btnCart.addEventListener('click', () => {
+      if (!window.evento || !window.eventoParam) {
+        alert('Evento ainda está carregando, tenta de novo em alguns segundos.');
+        return;
+      }
 
-    const items = [];
-    if (qIngress > 0) {
-      items.push({
-        id: `event:${eventoParam}:ingresso`,
-        eventoId: eventoParam,
-        name: document.getElementById('nome-ingresso-evento').textContent.trim(),
-        unitPrice: Number(evento.ingresso.preco),
-        qty: qIngress,
-        kind: 'ingresso'
-      });
-    }
-    if (qExcurs > 0) {
-      items.push({
-        id: `event:${eventoParam}:excursao`,
-        eventoId: eventoParam,
-        name: document.getElementById('nome-excursao-evento').textContent.trim(),
-        unitPrice: Number(evento.excursao.preco),
-        qty: qExcurs,
-        kind: 'excursao'
-      });
-    }
+      const ev = window.evento;
+      const eventoParam = String(window.eventoParam);
 
-    if (!items.length) {
-      alert('Selecione pelo menos 1 item para adicionar ao carrinho.');
-      return;
-    }
+      const qIngress = getQty(ingressoSection);
+      const qExcurs  = getQty(excursaoSection);
 
-    const state = CartStore.load();
-    for (const it of items) {
-      const existing = state.items.find(x => x.id === it.id);
-      if (existing) existing.qty += it.qty;
-      else state.items.push(it);
-    }
-    state.total = calcTotal(state.items);
-    if (!state.currency) state.currency = 'BRL';
-    if (!state.createdAt) state.createdAt = new Date().toISOString();
+      const items = [];
 
-    CartStore.save(state);
+      if (qIngress > 0) {
+        items.push({
+          id: `event:${eventoParam}:ingresso`,
+          eventoId: eventoParam,
+          name: document.getElementById('nome-ingresso-evento').textContent.trim(),
+          unitPrice: Number(ev.ingresso.preco),
+          qty: qIngress,
+          kind: 'ingresso'
+        });
+      }
 
-    window.location.href = 'carrinho.html';
-  });
+      if (qExcurs > 0) {
+        items.push({
+          id: `event:${eventoParam}:excursao`,
+          eventoId: eventoParam,
+          name: document.getElementById('nome-excursao-evento').textContent.trim(),
+          unitPrice: Number(ev.excursao.preco),
+          qty: qExcurs,
+          kind: 'excursao'
+        });
+      }
+
+      if (!items.length) {
+        alert('Selecione pelo menos 1 item para adicionar ao carrinho.');
+        return;
+      }
+
+      const state = CartStore.load();
+      for (const it of items) {
+        const existing = state.items.find(x => x.id === it.id);
+        if (existing) existing.qty += it.qty;
+        else state.items.push(it);
+      }
+
+      CartStore.save(state);
+
+      window.location.href = 'carrinho.html';
+    });
+  }
 </script>
 
-<script>
-(function () {
-  const CART_KEY = 'cart:v1';
-  const badgeEl = document.getElementById('cart-count-badge');
-  if (!badgeEl) return;
 
-  function getCount() {
-    try {
-      const state = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}');
-      return (state.items || []).reduce((sum, it) => sum + (parseInt(it.qty, 10) || 0), 0);
-    } catch { return 0; }
-  }
-
-  function renderBadge() {
-    const n = getCount();
-    badgeEl.textContent = n;
-    badgeEl.style.display = n > 0 ? 'inline-block' : 'none';
-  }
-
-  renderBadge();
-  window.addEventListener('storage', (e) => { if (e.key === CART_KEY) renderBadge(); });
-
-  if (window.CartStore && typeof window.CartStore.save === 'function') {
-    const originalSave = window.CartStore.save.bind(window.CartStore);
-    window.CartStore.save = function (state) {
-      const r = originalSave(state);
-      renderBadge();
-      return r;
-    };
-  }
-
-  window.updateCartCountBadge = renderBadge;
-})();
-</script>
+<script src="js/cart-badge.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

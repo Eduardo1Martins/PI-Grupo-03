@@ -256,7 +256,7 @@
 
     const pLoc = document.createElement('p');
     pLoc.className = 'card-text';
-    pLoc.textContent = [cidade, local].filter(Boolean).join(' - ');
+    pLoc.textContent = [cidade,].filter(Boolean).join(' - ');
 
     left.append(h5, pLoc);
 
@@ -270,7 +270,7 @@
     if (preco !== null && preco !== undefined && preco !== '')
       pPrice.textContent = Number(preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-    right.append(pDate, pPrice);
+    right.append(pDate);
 
     body.append(left, right);
     card.append(img, body);
@@ -384,6 +384,8 @@ function formatDateBR(iso) {
 })();
 </script>
 
+
+<script src="js/cart-badge.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
