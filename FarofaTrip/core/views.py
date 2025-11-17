@@ -1,4 +1,5 @@
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets, status, permissions, filters
+from django.utils.timezone import localdate
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
@@ -56,5 +57,19 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     
 
 class EventoViewSet(viewsets.ModelViewSet):
-    queryset = Evento.objects.all()
     serializer_class = EventoSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['nome', 'cidade', 'local', 'descricao']
+    ordering_fields = ['data', 'nome', 'cidade']
+    ordering = ['data']
+
+    def get_queryset(self):
+        qs = Evento.objects.all().order_by('data')
+        scope = (self.request.query_params.get('scope') or 'future').lower()
+        if scope == 'future':
+            qs = qs.filter(data__gte=localdate())
+        elif scope == 'past':
+            qs = qs.filter(data__lt=localdate())
+        # scope=all -> sem filtro de data
+        return qs

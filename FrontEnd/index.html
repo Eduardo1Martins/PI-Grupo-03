@@ -163,245 +163,227 @@
         <i class="bi bi-search text-muted"></i>
       </span>
     </div>
+    
 
     <h3 class="title fw-bold mb-0">Próximos Eventos</h3>
 
     <div class="divider mb-4"></div>
 
-    <div class="card mb-4 card-evento" data-evento="mandallah" style="cursor:pointer;">
-      <img src="./assets/img/banner-Mandallah.png" alt="Mandallah" class="card-img-top">
-      <div class="card-body d-flex justify-content-between">
-        <div>
-         <h5 class="card-text fw-bold">Mandallah - 20 anos</h5>
-         <p class="card-text">Itirapina-SP</p>
-         </div>
-            <div>
-            <p class="fw-semibold">15/10</p>
-            </div>
-      </div>
-    </div>
+    
+<div id="events-list"></div>
 
-    <div class="card mb-4 card-evento" data-evento="trance-legalize" style="cursor:pointer;">
-      <img src="./assets/img/banner-TranceLegalize.png" alt="Mandallah" class="card-img-top">
-      <div class="card-body d-flex justify-content-between">
-        <div>
-         <h5 class="card-text fw-bold">Trance Legalize</h5>
-         <p class="card-text">Rio Claro-SP</p>
-         </div>
-         <div>
-            <p class="fw-semibold">02/11</p>
-            </div>
-      </div>
-    </div>
-
-      <div class="card mb-4 card-evento" data-evento="arvore-da-vida" style="cursor:pointer;">
-      <img src="./assets/img/banner-ArvoreDaVida.png" alt="Mandallah" class="card-img-top">
-      <div class="card-body d-flex justify-content-between">
-        <div>
-         <h5 class="card-text fw-bold">Árvore da Vida</h5>
-         <p class="card-text">Itirapina-SP</p>
-         </div>
-         <div>
-            <p class="fw-semibold">15/11</p>
-            </div>
-      </div>
-    </div>
-
-        <div class="card mb-4 card-evento" data-evento="psy-festival" style="cursor:pointer;">
-      <img src="./assets/img/banner-PSY.png" alt="Mandallah" class="card-img-top">
-      <div class="card-body d-flex justify-content-between">
-        <div>
-         <h5 class="card-text fw-bold">PSY Festival</h5>
-         <p class="card-text">Sumaré-SP</p>
-         </div>
-         <div>
-            <p class="fw-semibold">03/12</p>
-            </div>
-      </div>
-    </div>
-
-        <div class="card mb-4 card-evento" data-evento="shanti-festival" style="cursor:pointer;">
-      <img src="./assets/img/banner-ShantiFestival.png" alt="Mandallah" class="card-img-top">
-      <div class="card-body d-flex justify-content-between">
-        <div>
-         <h5 class="card-text fw-bold">Shanti Festival</h5>
-         <p class="card-text">Mariporã-SP</p>
-         </div>
-         <div>
-            <p class="fw-semibold">24/01</p>
-            </div>
-      </div>
-    </div>
-
-        <div class="card mb-4 card-evento" data-evento="shiva-shankar" style="cursor:pointer;">
-      <img src="./assets/img/banner-ShivaShankar.png" alt="Mandallah" class="card-img-top">
-      <div class="card-body d-flex justify-content-between">
-        <div>
-         <h5 class="card-text fw-bold">Shiva Shankar</h5>
-         <p class="card-text">Rio Claro-SP</p>
-         </div>
-         <div>
-            <p class="fw-semibold">07/03</p>
-            </div>
-      </div>
-    </div>
-
-        <div class="card mb-4 card-evento" data-evento="flor-da-vida" style="cursor:pointer;">
-      <img src="./assets/img/banner-FlorDaVida.png" alt="Mandallah" class="card-img-top">
-      <div class="card-body d-flex justify-content-between">
-        <div>
-         <h5 class="card-text fw-bold">Flor da Vida</h5>
-         <p class="card-text">Itirapina-SP</p>
-         </div>
-         <div>
-            <p class="fw-semibold">21/03</p>
-            </div>
-      </div>
-    </div>
-
-        <div class="card mb-4 card-evento" data-evento="yanomami-festival" style="cursor:pointer;">
-      <img src="./assets/img/banner-YanomamiFestival.png" alt="Mandallah" class="card-img-top">
-      <div class="card-body d-flex justify-content-between">
-        <div>
-         <h5 class="card-text fw-bold">Yanomami Festival</h5>
-         <p class="card-text">Itirapina-SP</p>
-         </div>
-         <div>
-            <p class="fw-semibold">20/05</p>
-            </div>
-      </div>
-    </div>
-
-  </div>
 
 
  <script>
-  document.querySelectorAll(".card-evento").forEach(card => {
-    card.addEventListener("click", () => {
-      const evento = card.getAttribute("data-evento");
-      window.location.href = `ingresso.html?evento=${evento}`;
-    });
-  });
-</script>
-
-<script>
 (function () {
-  const slides = [
-    { src: "./assets/img/banner-Principal.png",   title: "Árvore da vida",      subtitle: "Fazenda Meia Lua - Itirapina-SP" },
-    { src: "./assets/img/banner-Mandallah.png",   title: "Mandallah - 20 anos", subtitle: "Itirapina-SP" },
-    { src: "./assets/img/banner-TranceLegalize.png", title: "Trance Legalize",  subtitle: "Rio Claro-SP" },
-    { src: "./assets/img/banner-PSY.png",         title: "PSY Festival",        subtitle: "Sumaré-SP" },
-    { src: "./assets/img/banner-ShantiFestival.png", title: "Shanti Festival",  subtitle: "Mariporã-SP" },
-    { src: "./assets/img/banner-ShivaShankar.png",   title: "Shiva Shankar",    subtitle: "Rio Claro-SP" },
-    { src: "./assets/img/banner-FlorDaVida.png",  title: "Flor da Vida",        subtitle: "Itirapina-SP" },
-    { src: "./assets/img/banner-YanomamiFestival.png", title: "Yanomami Festival", subtitle: "Itirapina-SP" }
-  ];
+  const API_BASE = 'http://localhost:8000/api';
 
-  const container  = document.querySelector(".banner-container");
-  if (!container) return;
+  const TOKEN_KEYS = ['token', 'token2'];
+  function getToken() {
+    for (const k of TOKEN_KEYS) {
+      const v = localStorage.getItem(k);
+      if (v) return String(v).replace(/^"|"$/g, '');
+    }
+    return null;
+  }
+  const baseHeaders = { Accept: 'application/json' };
+  const jwt = getToken();
+  if (jwt) baseHeaders.Authorization = `Bearer ${jwt}`;
 
-  const imgEl      = container.querySelector("img");
-  const titleEl    = container.querySelector(".banner-text h5");
-  const subtitleEl = container.querySelector(".banner-text small");
+  const listEl   = document.getElementById('events-list');          
+  const searchEl = document.querySelector('.input-group input');     
+  const bannerEl = document.querySelector('.banner-container');      
 
-  slides.forEach(s => { const im = new Image(); im.src = s.src; });
+  let allEvents = [];
 
-  let i = 0;
-  const INTERVALO_MS = 5000;
+ async function fetchEventos() {
+  const urlAll = `${API_BASE}/eventos/?ordering=-data&scope=all`;
+  const listAll = await getList(urlAll);
+  return { eventos: listAll, fromPast: false };
+}
 
-  function aplicarSlide(s) {
-    if (imgEl) { imgEl.src = s.src; imgEl.alt = s.title; }
-    if (titleEl) titleEl.textContent = s.title;
-    if (subtitleEl) subtitleEl.textContent = s.subtitle;
+  async function getList(url) {
+    const r = await fetch(url, { headers: baseHeaders });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const j = await r.json();
+    return Array.isArray(j) ? j : (j.results || []);
   }
 
-  aplicarSlide(slides[0]);
-
-  function next() { i = (i + 1) % slides.length; aplicarSlide(slides[i]); }
-  function prev() { i = (i - 1 + slides.length) % slides.length; aplicarSlide(slides[i]); }
-
-  let timer = startTimer();
-  function startTimer() { return setInterval(next, INTERVALO_MS); }
-  function resetTimer() { clearInterval(timer); timer = startTimer(); }
-
-  function makeBtn(side) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.setAttribute("aria-label", side === "left" ? "Slide anterior" : "Próximo slide");
-
-    Object.assign(b.style, {
-      position: "absolute",
-      top: "50%",
-      transform: "translateY(-50%)",
-      [side]: "10px",
-      width: "40px",
-      height: "40px",
-      border: "none",
-      borderRadius: "50%",
-      background: "rgba(0,0,0,0.45)",
-      color: "#fff",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      cursor: "pointer",
-      zIndex: "5",
-      outline: "none",
+  fetchEventos()
+    .then(({ eventos }) => {
+      allEvents = eventos;
+      renderList(allEvents);
+      buildBanner(allEvents);
+    })
+    .catch((err) => {
+      console.error('Erro ao carregar eventos:', err);
+      renderEmpty('Não foi possível carregar os eventos.');
     });
-    b.innerHTML = side === "left"
-      ? '<i class="bi bi-chevron-left fs-4"></i>'
-      : '<i class="bi bi-chevron-right fs-4"></i>';
-    return b;
+
+  function renderList(events) {
+    listEl.innerHTML = '';
+    if (!events.length) {
+      renderEmpty('Nenhum evento encontrado.');
+      return;
+    }
+    for (const ev of events) listEl.appendChild(makeCard(ev));
   }
 
-  const leftBtn  = makeBtn("left");
-  const rightBtn = makeBtn("right");
-  container.append(leftBtn, rightBtn);
+  function renderEmpty(msg) {
+    listEl.innerHTML = `<p class="text-center text-muted">${msg}</p>`;
+  }
 
-  leftBtn.addEventListener("click", () => { prev(); resetTimer(); });
-  rightBtn.addEventListener("click", () => { next(); resetTimer(); });
+  function makeCard(ev) {
+    const { id, nome, cidade, local, data, imagem, preco } = ev;
 
-  container.setAttribute("tabindex", "0");
-  container.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft")  { prev(); resetTimer(); }
-    if (e.key === "ArrowRight") { next(); resetTimer(); }
-  });
+    const card = document.createElement('div');
+    card.className = 'card mb-4 card-evento';
+    card.style.cursor = 'pointer';
+    card.dataset.evento = id;
+
+    const img = document.createElement('img');
+    img.className = 'card-img-top';
+    img.alt = nome || 'Evento';
+    img.src = imagem || './assets/img/placeholder.png';
+
+    const body = document.createElement('div');
+    body.className = 'card-body d-flex justify-content-between';
+
+    const left = document.createElement('div');
+    const h5   = document.createElement('h5');
+    h5.className = 'card-text fw-bold';
+    h5.textContent = nome || 'Evento';
+
+    const pLoc = document.createElement('p');
+    pLoc.className = 'card-text';
+    pLoc.textContent = [cidade, local].filter(Boolean).join(' - ');
+
+    left.append(h5, pLoc);
+
+    const right = document.createElement('div');
+    const pDate = document.createElement('p');
+    pDate.className = 'fw-semibold mb-1';
+    pDate.textContent = formatDateBR(data);
+
+    const pPrice = document.createElement('small');
+    pPrice.className = 'text-muted';
+    if (preco !== null && preco !== undefined && preco !== '')
+      pPrice.textContent = Number(preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    right.append(pDate, pPrice);
+
+    body.append(left, right);
+    card.append(img, body);
+
+    card.addEventListener('click', () => {
+      window.location.href = `ingresso.html?evento=${encodeURIComponent(id)}`;
+    });
+
+    return card;
+  }
+
+function formatDateBR(iso) {
+  if (!iso) return '';
+  const [y, m, d] = String(iso).split('-').map(Number);
+  if (!y || !m || !d) return '';
+  const date = new Date(y, m - 1, d);
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit'
+  }).format(date);
+}
+ 
+
+  function buildBanner(events) {
+    if (!bannerEl) return;
+
+    const imgEl      = bannerEl.querySelector('img');
+    const titleEl    = bannerEl.querySelector('.banner-text h5');
+    const subtitleEl = bannerEl.querySelector('.banner-text small');
+
+    const slides = events
+      .filter(e => !!e.imagem)
+      .slice(0, 8)
+      .map(e => ({
+        src: e.imagem,
+        title: e.nome || 'Evento',
+        subtitle: [e.cidade, e.local].filter(Boolean).join(' - ')
+      }));
+
+    if (!slides.length || !imgEl || !titleEl || !subtitleEl) return;
+
+    slides.forEach(s => { const pre = new Image(); pre.src = s.src; });
+
+    let i = 0;
+    const INTERVAL_MS = 3000;
+
+    function applySlide(s) {
+      imgEl.src = s.src;
+      imgEl.alt = s.title;
+      titleEl.textContent = s.title;
+      subtitleEl.textContent = s.subtitle;
+    }
+
+    applySlide(slides[0]);
+
+    let timer = setInterval(nextSlide, INTERVAL_MS);
+    function nextSlide() {
+      i = (i + 1) % slides.length;
+      applySlide(slides[i]);
+    }
+    function prevSlide() {
+      i = (i - 1 + slides.length) % slides.length;
+      applySlide(slides[i]);
+    }
+    function resetTimer() {
+      clearInterval(timer);
+      timer = setInterval(nextSlide, INTERVAL_MS);
+    }
+
+    function makeBtn(side, label, clickFn) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', label);
+      Object.assign(b.style, {
+        position: 'absolute', top: '50%', transform: 'translateY(-50%)',
+        [side]: '10px', width: '40px', height: '40px', border: 'none',
+        borderRadius: '50%', background: 'rgba(0,0,0,0.45)', color: '#fff',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', zIndex: '5'
+      });
+      b.innerHTML = side === 'left' ? '&larr;' : '&rarr;';
+      b.addEventListener('click', () => { clickFn(); resetTimer(); });
+      return b;
+    }
+    const leftBtn  = makeBtn('left',  'Anterior', prevSlide);
+    const rightBtn = makeBtn('right', 'Próximo',  nextSlide);
+    bannerEl.append(leftBtn, rightBtn);
+
+    bannerEl.tabIndex = 0;
+    bannerEl.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft')  { prevSlide();  resetTimer(); }
+      if (e.key === 'ArrowRight') { nextSlide();  resetTimer(); }
+    });
+  }
+
+  if (searchEl) {
+    let t;
+    searchEl.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        const q = searchEl.value.trim().toLowerCase();
+        if (!q) return renderList(allEvents);
+        const filtered = allEvents.filter(e => {
+          const campos = [e.nome, e.cidade, e.local, e.descricao].map(v => (v || '').toLowerCase());
+          return campos.some(v => v.includes(q));
+        });
+        renderList(filtered);
+      }, 150);
+    });
+  }
 })();
 </script>
 
-<script>
-(function () {
-  const CART_KEY = 'cart:v1';
-  const badgeEl = document.getElementById('cart-count-badge');
-  if (!badgeEl) return;
-
-  function getCount() {
-    try {
-      const state = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}');
-      return (state.items || []).reduce((sum, it) => sum + (parseInt(it.qty, 10) || 0), 0);
-    } catch { return 0; }
-  }
-
-  function renderBadge() {
-    const n = getCount();
-    badgeEl.textContent = n;
-    badgeEl.style.display = n > 0 ? 'inline-block' : 'none';
-  }
-
-  renderBadge();
-  window.addEventListener('storage', (e) => { if (e.key === CART_KEY) renderBadge(); });
-
-  if (window.CartStore && typeof window.CartStore.save === 'function') {
-    const originalSave = window.CartStore.save.bind(window.CartStore);
-    window.CartStore.save = function (state) {
-      const r = originalSave(state);
-      renderBadge();
-      return r;
-    };
-  }
-
-  window.updateCartCountBadge = renderBadge;
-})();
-</script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

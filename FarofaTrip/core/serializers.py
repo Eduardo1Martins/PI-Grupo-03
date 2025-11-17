@@ -64,6 +64,11 @@ class RegisterSerializer(serializers.Serializer):
     def validate_password(self, value):
         validate_password(value)
         return value
+    
+    def validate_cpf(self, value):
+        if Perfil.objects.filter(cpf=value).exists():
+            raise serializers.ValidationError("CPF já cadastrado.")
+        return value
 
     @transaction.atomic
     def create(self, validated_data):
