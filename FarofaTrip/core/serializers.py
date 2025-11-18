@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.db import transaction
 from .models import Perfil, Evento
@@ -26,10 +26,10 @@ class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
                 user = User.objects.get(email__iexact=email)
                 attrs[username_field] = getattr(user, username_field)
             except User.DoesNotExist:
-                pass
+                
+                raise exceptions.AuthenticationFailed("No active account found with the given credentials")
 
         return super().validate(attrs)
-
 
 User = get_user_model()
 
@@ -123,9 +123,14 @@ class PerfilSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop("user", {})
+
         username = user_data.get("username") or user_data.get("email")
         if not username:
-            raise serializers.ValidationError({"username": "username ou email é obrigatório."})
+            raise serializers.ValidationError(
+                {"username": "username ou email é obrigatório."}
+            )
+
+        user_data["username"] = username
 
         if "password" in user_data:
             pwd = user_data.pop("password")
@@ -133,7 +138,7 @@ class PerfilSerializer(serializers.ModelSerializer):
             from django.utils.crypto import get_random_string
             pwd = get_random_string(12)
 
-        user = User.objects.create_user(password=pwd, **user_data, username=username)
+        user = User.objects.create_user(password=pwd, **user_data)
         perfil = Perfil.objects.create(user=user, **validated_data)
         return perfil
 

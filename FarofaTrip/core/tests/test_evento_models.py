@@ -1,34 +1,58 @@
-from django.test import TestCase
-from core.models import Evento
 from datetime import date
 from decimal import Decimal
 
-class EventoModelTest(TestCase):
+from django.test import TestCase
 
-    def test_criacao_evento(self):
+from core.models import Evento
+
+
+class EventoModelTest(TestCase):
+    def test_criacao_evento_com_excursao(self):
         evento = Evento.objects.create(
             nome="Show do Legião Urbana",
             local="Arena SP",
             cidade="São Paulo",
             data=date(2025, 12, 25),
             descricao="Um tributo à Legião Urbana",
-            imagem="https://example.com/legiao.jpg",
-            preco=Decimal("199.90")
+            imagem="eventos/legiao.jpg",
+            ingresso=Decimal("199.90"),
+            excursao=Decimal("100.00"),
         )
 
         self.assertEqual(Evento.objects.count(), 1)
         self.assertEqual(evento.nome, "Show do Legião Urbana")
-        self.assertEqual(str(evento), "Show do Legião Urbana - São Paulo")
+        self.assertEqual(evento.local, "Arena SP")
+        self.assertEqual(evento.cidade, "São Paulo")
+        self.assertEqual(evento.ingresso, Decimal("199.90"))
+        self.assertEqual(evento.excursao, Decimal("100.00"))
+        # __str__ deve retornar apenas o nome
+        self.assertEqual(str(evento), "Show do Legião Urbana")
 
-    def test_preco_decimal(self):
+    def test_excursao_default_zero(self):
+        evento = Evento.objects.create(
+            nome="Evento sem excursão",
+            local="Arena de Teste",
+            cidade="Campinas",
+            data=date.today(),
+            descricao="Somente ingresso, sem excursão",
+            imagem="eventos/sem_excursao.jpg",
+            ingresso=Decimal("59.90"),
+        )
+
+        # se não for informado, excursao deve usar o default=0
+        self.assertEqual(evento.excursao, Decimal("0"))
+
+    def test_ingresso_e_excursao_sao_decimal(self):
         evento = Evento.objects.create(
             nome="Evento Teste",
             local="Local Teste",
             cidade="Cidade Teste",
             data=date.today(),
             descricao="Evento para teste",
-            imagem="https://example.com/img.jpg",
-            preco=Decimal("59.99")
+            imagem="eventos/img.jpg",
+            ingresso=Decimal("59.99"),
+            excursao=Decimal("15.50"),
         )
-        self.assertIsInstance(evento.preco, Decimal)
-        self.assertEqual(evento.preco, Decimal("59.99"))
+
+        self.assertIsInstance(evento.ingresso, Decimal)
+        self.assertIsInstance(evento.excursao, Decimal)

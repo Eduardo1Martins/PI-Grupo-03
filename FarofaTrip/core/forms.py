@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario, Evento
+from .models import Perfil, Evento
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -54,9 +54,9 @@ class LoginForm(forms.ModelForm):
 
             self.user = user
 
-class UsuarioForm(forms.ModelForm):
+class PerfilForm(forms.ModelForm):
     class Meta:
-        model = Usuario
+        model = Perfil
         fields = '__all__'
         labels = {
             'nome': 'Nome Completo:',
