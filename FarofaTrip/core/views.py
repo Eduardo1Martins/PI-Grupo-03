@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Perfil, Evento
-from .serializers import PerfilSerializer, EventoSerializer, RegisterSerializer, EmailOrUsernameTokenObtainPairSerializer
+from .serializers import PerfilSerializer, EventoSerializer, RegisterSerializer, EmailOrUsernameTokenObtainPairSerializer, PedidoSerializer
 
 # LOGIN
 class LoginView(TokenObtainPairView):
@@ -71,5 +71,20 @@ class EventoViewSet(viewsets.ModelViewSet):
             qs = qs.filter(data__gte=localdate())
         elif scope == 'past':
             qs = qs.filter(data__lt=localdate())
-        # scope=all -> sem filtro de data
         return qs
+    
+    
+class PedidoViewSet(viewsets.ModelViewSet):
+    serializer_class = PedidoSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        qs = Pedido.objects.all().select_related("usuario", "perfil").prefetch_related(
+            "itens__evento"
+        )
+
+        user = self.request.user
+        if user.is_authenticated:
+            return qs.filter(usuario=user)
+
+        return qs.none()

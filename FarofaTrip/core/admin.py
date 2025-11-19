@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Perfil, Evento
+from .models import Perfil, Evento, Pedido
 
 @admin.register(Perfil)
 class PerfilAdmin(admin.ModelAdmin):
@@ -10,3 +10,7 @@ class PerfilAdmin(admin.ModelAdmin):
 class EventoAdmin(admin.ModelAdmin):
     list_display = ("id", "nome", "cidade", "data", "ingresso", "excursao")
     search_fields = ("nome", "cidade",)
+
+@admin.register(Pedido)
+class PedidoAdmin(admin.ModelAdmin):
+    list_display = ("id", "criado_em", "atualizado_em", "status", "forma_pagamento", "valor_total", "observacoes")

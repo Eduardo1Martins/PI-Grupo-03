@@ -91,6 +91,13 @@
       border: 1px solid #24D301;
     }
 
+    .pix-icon {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      filter: invert(100%);
+}
+
     .btn-finalizar {
       background-color: #24D301;
       color: #000;
@@ -171,13 +178,20 @@
   <div class="card-section">
     <h6>Dados do Pagamento</h6>
     <div class="payment-option">
-      <input type="radio" name="pagamento" id="credito" value="credito" checked>
-      <label for="credito">💳 Cartão de Crédito</label>
-    </div>
-    <div class="payment-option">
-      <input type="radio" name="pagamento" id="pix" value="pix">
-      <label for="pix">🟢 PIX</label>
-    </div>
+  <input type="radio" name="pagamento" id="credito" value="credito" checked>
+  <label for="credito" class="d-flex align-items-center gap-2 mb-0">
+    <img src="./assets/img/card1.svg" alt="PIX" class="pix-icon">
+    <span>Cartão de Crédito</span>
+  </label>
+</div>
+
+<div class="payment-option">
+  <input type="radio" name="pagamento" id="pix" value="pix">
+  <label for="pix" class="d-flex align-items-center gap-2 mb-0">
+    <img src="./assets/img/pix.svg" alt="PIX" class="pix-icon">
+    <span>PIX</span>
+  </label>
+</div>
 
 <div id="formCredito">
     <h6 class="mt-4">Insira seus dados:</h6>
@@ -189,7 +203,11 @@
   </form>
 </div>
 
-  <a href="pedido.html" style="text-decoration: none;"><button class="btn btn-finalizar">Finalizar Pedido</button></a>
+</div>
+
+
+
+  <button id="btn-finalizar" class="btn btn-finalizar">Finalizar Pedido</button>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -245,6 +263,159 @@
   window.updateCartCountBadge = renderBadge;
 })();
 </script>
+
+<script>
+  // ==== Configuração básica ====
+  const API_BASE = 'http://localhost:8000/api';
+  const CART_KEY = 'cart:v1';
+  const LAST_ORDER_KEY = 'order:last';
+
+  const TOKEN_KEYS = ['access', 'token', 'token2'];
+  function getToken() {
+    for (const k of TOKEN_KEYS) {
+      const v = localStorage.getItem(k);
+      if (v) return String(v).replace(/^"|"$/g, '');
+    }
+    return null;
+  }
+
+  const baseHeaders = { Accept: 'application/json' };
+  const jwt = getToken();
+  if (jwt) baseHeaders.Authorization = `Bearer ${jwt}`;
+
+  function loadCart() {
+    try {
+      return JSON.parse(localStorage.getItem(CART_KEY)) || { items: [] };
+    } catch {
+      return { items: [] };
+    }
+  }
+
+  function calcTotal(items) {
+    return items.reduce(
+      (acc, it) => acc + (Number(it.unitPrice || 0) * Number(it.qty || 0)),
+      0
+    );
+  }
+
+  function buildPedidoPayloadFromCart(cartState) {
+    const pagamento = document.querySelector('input[name="pagamento"]:checked')?.value || 'credito';
+
+    return {
+      forma_pagamento: pagamento,               // backend: Pedido.forma_pagamento
+      observacoes: `Pagamento via ${pagamento.toUpperCase()} - app`, // opcional
+      itens: (cartState.items || []).map(it => ({
+        // mapeia 1:1 cada linha do carrinho para um item do pedido
+        evento_id: it.eventoId,                 // precisa existir no carrinho
+        quantidade: Number(it.qty || 0),
+        // separa ingresso x excursão usando o "kind" que você já usa no carrinho
+        preco_ingresso: it.kind === 'ingresso' ? Number(it.unitPrice || 0) : 0,
+        preco_excursao: it.kind === 'excursao' ? Number(it.unitPrice || 0) : 0
+      }))
+    };
+  }
+
+  function buildOrderSnapshot(pedido, cartState) {
+    // Se o backend devolver os itens, usamos; senão, usamos o snapshot do carrinho
+    const backendItems = Array.isArray(pedido.itens) ? pedido.itens : null;
+
+    let items;
+    if (backendItems) {
+      items = backendItems.map(pi => {
+        const unit = Number(pi.subtotal || 0) / (Number(pi.quantidade || 1) || 1);
+        return {
+          name: pi.evento_nome || 'Ingresso',
+          unitPrice: unit,
+          qty: Number(pi.quantidade || 1),
+          kind: null,
+          eventoId: pi.evento || null
+        };
+      });
+    } else {
+      items = (cartState.items || []).map(it => ({
+        name: it.name,
+        unitPrice: Number(it.unitPrice || 0),
+        qty: Number(it.qty || 0),
+        kind: it.kind || null,
+        eventoId: it.eventoId || null
+      }));
+    }
+
+    return {
+      id: pedido.id || pedido.codigo || null,          // id do pedido no backend
+      backendId: pedido.id || null,
+      items,
+      currency: 'BRL',
+      total: Number(pedido.valor_total ?? cartState.total ?? calcTotal(cartState.items || [])),
+      createdAt: pedido.criado_em || new Date().toISOString()
+    };
+  }
+
+  async function enviarPedido() {
+    const cartState = loadCart();
+
+    if (!cartState.items || !cartState.items.length) {
+      alert('Seu carrinho está vazio. Volte e adicione algum item antes de pagar.');
+      return;
+    }
+
+    const payload = buildPedidoPayloadFromCart(cartState);
+
+    // validação básica: não mandar itens com quantidade 0
+    payload.itens = payload.itens.filter(it => it.quantidade > 0 && it.evento_id);
+
+    if (!payload.itens.length) {
+      alert('Não foi possível montar o pedido. Tente adicionar os itens novamente.');
+      return;
+    }
+
+    try {
+      const resp = await fetch(`${API_BASE}/pedidos/`, {
+        method: 'POST',
+        headers: {
+          ...baseHeaders,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!resp.ok) {
+        let msg = 'Erro ao criar o pedido.';
+        try {
+          const errData = await resp.json();
+          console.error('Erro backend /api/pedidos/:', errData);
+          msg += '\n\nDetalhes: ' + JSON.stringify(errData, null, 2);
+        } catch {
+          console.error('Erro backend /api/pedidos/ (sem JSON)');
+        }
+        alert(msg);
+        return;
+      }
+
+      const pedido = await resp.json();
+      console.log('Pedido criado com sucesso:', pedido);
+
+      // monta snapshot para página pedido.html
+      const orderSnapshot = buildOrderSnapshot(pedido, cartState);
+
+      // salva e limpa carrinho
+      localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(orderSnapshot));
+      localStorage.removeItem(CART_KEY);
+
+      // redireciona para tela de pedido
+      window.location.href = 'pedido.html';
+    } catch (err) {
+      console.error('Erro de rede ao criar pedido:', err);
+      alert('Erro de conexão ao criar o pedido. Verifique sua internet ou o servidor e tente novamente.');
+    }
+  }
+
+  document.getElementById('btn-finalizar')?.addEventListener('click', function (e) {
+    e.preventDefault();
+    enviarPedido();
+  });
+</script>
+
 
 <script src="js/cart-badge.js"></script>
 

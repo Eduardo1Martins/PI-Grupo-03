@@ -3,7 +3,9 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.db import transaction
-from .models import Perfil, Evento
+from .models import Perfil, Evento, Pedido, PedidoItem
+from decimal import Decimal
+
 
 User = get_user_model()
 
@@ -147,3 +149,114 @@ class EventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evento
         fields = "__all__"
+
+
+class PedidoItemSerializer(serializers.ModelSerializer):
+    evento_id = serializers.PrimaryKeyRelatedField(
+        queryset=Evento.objects.all(),
+        source="evento",
+        write_only=True,
+    )
+    evento_nome = serializers.CharField(
+        source="evento.nome",
+        read_only=True,
+    )
+
+    preco_ingresso = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        allow_null=True,
+    )
+
+    preco_excursao = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = PedidoItem
+        fields = [
+            "id",
+            "evento_id",
+            "evento_nome",
+            "quantidade",
+            "preco_ingresso",
+            "preco_excursao",
+            "subtotal",
+        ]
+        read_only_fields = ["id", "subtotal", "evento_nome"]
+
+
+
+
+class PedidoSerializer(serializers.ModelSerializer):
+    itens = PedidoItemSerializer(many=True)
+
+    class Meta:
+        model = Pedido
+        fields = [
+            "id",
+            "usuario",
+            "status",
+            "forma_pagamento",
+            "valor_total",
+            "observacoes",
+            "criado_em",
+            "itens",
+        ]
+        read_only_fields = [
+            "id",
+            "usuario",
+            "status",
+            "valor_total",
+            "criado_em",
+        ]
+
+    def create(self, validated_data):
+        itens_data = validated_data.pop("itens", [])
+
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
+        if user and user.is_authenticated:
+            validated_data["usuario"] = user
+
+        validated_data.pop("perfil", None)
+
+        pedido = Pedido.objects.create(**validated_data)
+
+        total = Decimal("0.00")
+
+        for item_data in itens_data:
+            evento = item_data["evento"]
+            quantidade = item_data.get("quantidade", 1)
+
+            preco_ingresso = item_data.get("preco_ingresso")
+            if preco_ingresso is None:
+                preco_ingresso = evento.ingresso
+
+            preco_excursao = item_data.get("preco_excursao")
+            if preco_excursao is None:
+                preco_excursao = evento.excursao
+
+            subtotal = (preco_ingresso + preco_excursao) * quantidade
+
+            PedidoItem.objects.create(
+                pedido=pedido,
+                evento=evento,
+                quantidade=quantidade,
+                preco_ingresso=preco_ingresso,
+                preco_excursao=preco_excursao,
+                subtotal=subtotal,
+            )
+
+            total += subtotal
+
+        pedido.valor_total = total
+        pedido.status = "pago" if pedido.forma_pagamento else "pendente"
+        pedido.save()
+
+        return pedido
