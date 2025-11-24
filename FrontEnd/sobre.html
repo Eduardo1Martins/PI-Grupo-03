@@ -50,9 +50,110 @@
   margin: 0.5rem;  
   margin-top: 0.25rem;
 }
+
+/* ============================
+   RESPONSIVIDADE PARA TELAS MAIORES
+   (tablets, notebooks e PCs)
+   ============================ */
+
+/* Tablets em diante (>= 768px) */
+@media (min-width: 768px) {
+
+  /* Evita body "travado" em 90vh */
+  body {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  /* Centraliza e limita largura dos conteúdos principais */
+  .titulo,
+  .title,
+  .divider,
+  .sobre-nos,
+  .texto,
+  .card-section,
+  .event-info,
+  form,
+  .total-input,
+  .mensagem-final {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Dá um respiro maior no topo da página */
+  .titulo,
+  .title {
+    margin-top: 1.5rem;
+  }
+
+  /* Blocos "card-section" ficam parecidos em todas as telas */
+  .card-section {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Área de informações do evento (ingresso) fica mais organizada */
+  .event-info {
+    gap: 1.5rem;
+  }
+
+  .event-info img {
+    max-width: 160px;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Botões de ação principais: largura agradável no desktop */
+  .btn-cart,
+  .btn-confirmar,
+  .btn-finalizar,
+  .btn-voltar {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  /* Texto da página "Sobre nós" um pouco mais confortável de ler */
+  .sobre-nos .texto p {
+    font-size: 1.1rem;
+    line-height: 1.9rem;
+  }
+
+  /* Tela de embarque: conteúdo mais compacto em desktop */
+  .content {
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Notebooks/monitores grandes (>= 1200px) */
+@media (min-width: 1200px) {
+
+  .titulo,
+  .title,
+  .divider,
+  .sobre-nos,
+  .texto,
+  .card-section,
+  .event-info,
+  form,
+  .total-input,
+  .mensagem-final {
+    max-width: 1040px;
+  }
+
+  /* Banner da home fica com largura controlada em telas enormes,
+     mas ainda ocupando quase toda a linha */
+  .banner-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
   </style>
 </head>
-<body>
   <body class="bg-black text-white">
 
  <nav class="navbar navbar-dark" style="background-color: #24D301;">

@@ -141,6 +141,107 @@
       background-color: #2ff500;
       color: #000;
     }
+
+        /* ============================
+   RESPONSIVIDADE PARA TELAS MAIORES
+   (tablets, notebooks e PCs)
+   ============================ */
+
+/* Tablets em diante (>= 768px) */
+@media (min-width: 768px) {
+
+  /* Evita body "travado" em 90vh */
+  body {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  /* Centraliza e limita largura dos conteúdos principais */
+  .titulo,
+  .title,
+  .divider,
+  .sobre-nos,
+  .texto,
+  .card-section,
+  .event-info,
+  form,
+  .total-input,
+  .mensagem-final {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Dá um respiro maior no topo da página */
+  .titulo,
+  .title {
+    margin-top: 1.5rem;
+  }
+
+  /* Blocos "card-section" ficam parecidos em todas as telas */
+  .card-section {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Área de informações do evento (ingresso) fica mais organizada */
+  .event-info {
+    gap: 1.5rem;
+  }
+
+  .event-info img {
+    max-width: 160px;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Botões de ação principais: largura agradável no desktop */
+  .btn-cart,
+  .btn-confirmar,
+  .btn-finalizar,
+  .btn-voltar {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  /* Texto da página "Sobre nós" um pouco mais confortável de ler */
+  .sobre-nos .texto p {
+    font-size: 1.1rem;
+    line-height: 1.9rem;
+  }
+
+  /* Tela de embarque: conteúdo mais compacto em desktop */
+  .content {
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Notebooks/monitores grandes (>= 1200px) */
+@media (min-width: 1200px) {
+
+  .titulo,
+  .title,
+  .divider,
+  .sobre-nos,
+  .texto,
+  .card-section,
+  .event-info,
+  form,
+  .total-input,
+  .mensagem-final {
+    max-width: 1040px;
+  }
+
+  /* Banner da home fica com largura controlada em telas enormes,
+     mas ainda ocupando quase toda a linha */
+  .banner-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
   </style>
 </head>
 <body>
@@ -218,14 +319,11 @@
 <script>
   const API_BASE = 'http://localhost:8000/api';
   const CART_KEY = 'cart:v1';
-
-  // Formatador de moeda
   const money = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL'
   });
 
-  // Tentativa de ler token JWT de múltiplas chaves possíveis
   const TOKEN_KEYS = ['token', 'token2'];
   function getToken() {
     for (const k of TOKEN_KEYS) {
@@ -239,148 +337,162 @@
   const jwt = getToken();
   if (jwt) baseHeaders.Authorization = `Bearer ${jwt}`;
 
-  /**
-   * Abstração de acesso ao estado do carrinho.
-   */
   const CartStore = {
     load() {
-      try { return JSON.parse(localStorage.getItem(CART_KEY)) || { items: [] }; }
-      catch { return { items: [] }; }
+      try {
+        return JSON.parse(localStorage.getItem(CART_KEY)) || { items: [] };
+      } catch {
+        return { items: [] };
+      }
     },
     save(state) {
       state.updatedAt = new Date().toISOString();
       state.total = calcTotal(state.items);
       localStorage.setItem(CART_KEY, JSON.stringify(state));
-      updateCartCountBadge?.(); // tenta atualizar badge global, se existir
     },
     clear() {
       localStorage.removeItem(CART_KEY);
-      updateCartCountBadge?.();
     }
   };
 
-  /**
-   * Calcula o total monetário do carrinho.
-   */
+  window.CartStore = CartStore;
+
   function calcTotal(items) {
-    return items.reduce((acc, it) => {
-      const price = parseFloat(it.preco) || 0;
-      const qty = parseInt(it.qty, 10) || 0;
-      return acc + price * qty;
-    }, 0);
+    return items.reduce((acc, it) => acc + (Number(it.unitPrice || 0) * Number(it.qty || 0)), 0);
   }
 
-  // Elementos principais da página
-  const tbody = document.querySelector('#cart-table tbody');
+  const listEl  = document.getElementById('cart-list');
   const totalEl = document.getElementById('cart-total');
-  const emptyEl = document.getElementById('cart-empty');
-  const tableWrapper = document.getElementById('cart-table-wrapper');
 
-  /**
-   * Renderiza o carrinho na tabela: linhas com nome, quantidade, subtotal etc.
-   */
-  function renderCart() {
+  async function syncCartWithBackend() {
     const state = CartStore.load();
-    const items = state.items || [];
+    const ids = [...new Set(
+      state.items
+        .map(it => it.eventoId)
+        .filter(Boolean)
+        .map(String)
+    )];
 
-    tbody.innerHTML = '';
+    if (!ids.length) return;
 
-    if (!items.length) {
-      // Se não houver itens, esconde tabela e mostra mensagem de carrinho vazio
-      tableWrapper.classList.add('d-none');
-      emptyEl.classList.remove('d-none');
+    const eventsById = {};
+
+    await Promise.all(ids.map(async (id) => {
+      try {
+        const resp = await fetch(`${API_BASE}/eventos/${id}/`, { headers: baseHeaders });
+        if (!resp.ok) return;
+        const ev = await resp.json();
+        eventsById[id] = ev;
+      } catch (e) {
+        console.error('Erro ao buscar evento', id, e);
+      }
+    }));
+
+    state.items.forEach((it) => {
+      const ev = eventsById[String(it.eventoId)];
+      if (!ev) return;
+
+      if (it.kind === 'ingresso') {
+        it.name = it.name || `Ingresso ${ev.nome}`;
+        it.unitPrice = Number(ev.ingresso);
+      } else if (it.kind === 'excursao') {
+        it.name = it.name || `Excursão ${ev.nome}`;
+        it.unitPrice = Number(ev.excursao || 0);
+      }
+    });
+
+    state.total = calcTotal(state.items);
+    CartStore.save(state);
+  }
+
+  function render() {
+    const state = CartStore.load();
+    listEl.innerHTML = '';
+
+    if (!state.items.length) {
+      listEl.innerHTML = '<p class="text-secondary mb-0">Seu carrinho está vazio.</p>';
       totalEl.textContent = money.format(0);
       return;
     }
 
-    tableWrapper.classList.remove('d-none');
-    emptyEl.classList.add('d-none');
+    state.items.forEach((it, idx) => {
+      const row = document.createElement('div');
+      row.className = 'item-line';
+      row.innerHTML = `
+        <div>
+          <span class="fw-semibold">${it.name}</span>
+          <span class="text-secondary">
+            Unitário: ${money.format(Number(it.unitPrice || 0))}
+          </span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-sm btn-light" data-action="dec" data-idx="${idx}">-</button>
+          <span class="px-2" data-role="qty">${it.qty}</span>
+          <button class="btn btn-sm btn-light" data-action="inc" data-idx="${idx}">+</button>
+          <span class="ms-3 fw-semibold" data-role="subtotal">
+            ${money.format(Number(it.unitPrice || 0) * Number(it.qty || 0))}
+          </span>
+          <button class="btn btn-sm btn-outline-danger ms-3" data-action="remove" data-idx="${idx}">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      `;
+      listEl.appendChild(row);
+    });
 
-    for (const item of items) {
-      const tr = document.createElement('tr');
-
-      const tdNome = document.createElement('td');
-      tdNome.textContent = item.nome || 'Item';
-
-      const tdQtd = document.createElement('td');
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.min = '1';
-      input.value = item.qty;
-      input.className = 'form-control form-control-sm';
-      input.addEventListener('change', () => onChangeQty(item.id, input.value));
-      tdQtd.appendChild(input);
-
-      const tdPreco = document.createElement('td');
-      tdPreco.textContent = money.format(item.preco || 0);
-
-      const tdSub = document.createElement('td');
-      tdSub.textContent = money.format((item.preco || 0) * (item.qty || 0));
-
-      const tdAcao = document.createElement('td');
-      const btnRemover = document.createElement('button');
-      btnRemover.type = 'button';
-      btnRemover.className = 'btn btn-sm btn-outline-danger';
-      btnRemover.textContent = 'Remover';
-      btnRemover.addEventListener('click', () => removeItem(item.id));
-      tdAcao.appendChild(btnRemover);
-
-      tr.append(tdNome, tdQtd, tdPreco, tdSub, tdAcao);
-      tbody.appendChild(tr);
-    }
-
-    totalEl.textContent = money.format(calcTotal(items));
+    totalEl.textContent = money.format(calcTotal(state.items));
   }
 
-  /**
-   * Handler de mudança de quantidade no input.
-   * Atualiza o item no localStorage e re-renderiza a tabela.
-   */
-  function onChangeQty(id, newQty) {
-    const qty = parseInt(newQty, 10);
-    if (isNaN(qty) || qty < 1) return;
-
+  function updateItem(idx, delta) {
     const state = CartStore.load();
-    const item = state.items.find(i => i.id === id);
-    if (!item) return;
+    const it = state.items[idx];
+    if (!it) return;
 
-    item.qty = qty;
+    it.qty = Math.max(0, (Number(it.qty) || 0) + delta);
+    if (it.qty === 0) state.items.splice(idx, 1);
+
+    state.total = calcTotal(state.items);
     CartStore.save(state);
-    renderCart();
+    render();
+    if (window.updateCartCountBadge) window.updateCartCountBadge();
   }
 
-  /**
-   * Remove um item do carrinho.
-   */
-  function removeItem(id) {
+  function removeItem(idx) {
     const state = CartStore.load();
-    state.items = state.items.filter(i => i.id !== id);
+    state.items.splice(idx, 1);
+    state.total = calcTotal(state.items);
     CartStore.save(state);
-    renderCart();
+    render();
+    if (window.updateCartCountBadge) window.updateCartCountBadge();
   }
 
-  /**
-   * Avança para a tela de pagamento, se o carrinho tiver itens.
-   */
-  function irParaPagamento() {
+  listEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.idx, 10);
+
+    if (btn.dataset.action === 'inc') updateItem(idx, +1);
+    if (btn.dataset.action === 'dec') updateItem(idx, -1);
+    if (btn.dataset.action === 'remove') removeItem(idx);
+  });
+
+  document.querySelector('.btn-confirmar')?.addEventListener('click', (e) => {
     const state = CartStore.load();
-    if (!state.items || !state.items.length) {
-      alert('Seu carrinho está vazio.');
+    if (!state.items.length) {
+      e.preventDefault();
+      alert('Seu carrinho está vazio. Adicione algum item antes de continuar.');
       return;
     }
-    window.location.href = 'pagamento.html';
-  }
-
-  // Inicialização da tela
-  document.addEventListener('DOMContentLoaded', () => {
-    renderCart();
-    document.getElementById('btn-pagamento')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      irParaPagamento();
-    });
+    state.total = calcTotal(state.items);
+    CartStore.save(state);
   });
-</script>
 
+
+  (async function initCart() {
+    await syncCartWithBackend();
+    render();
+  })();
+</script>
 
 
 <script src="js/cart-badge.js"></script>

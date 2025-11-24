@@ -115,6 +115,107 @@
       background-color: #2ff500;
       color: #000;
     }
+
+     /* ============================
+   RESPONSIVIDADE PARA TELAS MAIORES
+   (tablets, notebooks e PCs)
+   ============================ */
+
+/* Tablets em diante (>= 768px) */
+@media (min-width: 768px) {
+
+  /* Evita body "travado" em 90vh */
+  body {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  /* Centraliza e limita largura dos conteúdos principais */
+  .titulo,
+  .title,
+  .divider,
+  .sobre-nos,
+  .texto,
+  .card-section,
+  .event-info,
+  form,
+  .total-input,
+  .mensagem-final {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Dá um respiro maior no topo da página */
+  .titulo,
+  .title {
+    margin-top: 1.5rem;
+  }
+
+  /* Blocos "card-section" ficam parecidos em todas as telas */
+  .card-section {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Área de informações do evento (ingresso) fica mais organizada */
+  .event-info {
+    gap: 1.5rem;
+  }
+
+  .event-info img {
+    max-width: 160px;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Botões de ação principais: largura agradável no desktop */
+  .btn-cart,
+  .btn-confirmar,
+  .btn-finalizar,
+  .btn-voltar {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  /* Texto da página "Sobre nós" um pouco mais confortável de ler */
+  .sobre-nos .texto p {
+    font-size: 1.1rem;
+    line-height: 1.9rem;
+  }
+
+  /* Tela de embarque: conteúdo mais compacto em desktop */
+  .content {
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Notebooks/monitores grandes (>= 1200px) */
+@media (min-width: 1200px) {
+
+  .titulo,
+  .title,
+  .divider,
+  .sobre-nos,
+  .texto,
+  .card-section,
+  .event-info,
+  form,
+  .total-input,
+  .mensagem-final {
+    max-width: 1040px;
+  }
+
+  /* Banner da home fica com largura controlada em telas enormes,
+     mas ainda ocupando quase toda a linha */
+  .banner-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
   </style>
 </head>
 
@@ -211,29 +312,58 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
- <script>
+  <script>
   document.addEventListener('DOMContentLoaded', () => {
     const radios = document.querySelectorAll('input[name="pagamento"]');
     const formCredito = document.getElementById('formCredito');
 
-    /**
-     * Mostra/esconde o formulário de cartão com base na opção escolhida (crédito / pix / boleto).
-     */
     function toggleForm() {
       const selecionado = document.querySelector('input[name="pagamento"]:checked')?.value;
       const mostrar = selecionado === 'credito';
-
       formCredito.style.display = mostrar ? 'block' : 'none';
-      // Desabilita campos quando não estiver usando crédito (evita validação desnecessária)
       formCredito.querySelectorAll('input').forEach(el => el.disabled = !mostrar);
       formCredito.setAttribute('aria-hidden', mostrar ? 'false' : 'true');
     }
 
     radios.forEach(r => r.addEventListener('change', toggleForm));
-    toggleForm(); // roda uma vez ao carregar para aplicar o estado inicial
+    toggleForm();
   });
 </script>
 
+<script>
+(function () {
+  const CART_KEY = 'cart:v1';
+  const badgeEl = document.getElementById('cart-count-badge');
+  if (!badgeEl) return;
+
+  function getCount() {
+    try {
+      const state = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}');
+      return (state.items || []).reduce((sum, it) => sum + (parseInt(it.qty, 10) || 0), 0);
+    } catch { return 0; }
+  }
+
+  function renderBadge() {
+    const n = getCount();
+    badgeEl.textContent = n;
+    badgeEl.style.display = n > 0 ? 'inline-block' : 'none';
+  }
+
+  renderBadge();
+  window.addEventListener('storage', (e) => { if (e.key === CART_KEY) renderBadge(); });
+
+  if (window.CartStore && typeof window.CartStore.save === 'function') {
+    const originalSave = window.CartStore.save.bind(window.CartStore);
+    window.CartStore.save = function (state) {
+      const r = originalSave(state);
+      renderBadge();
+      return r;
+    };
+  }
+
+  window.updateCartCountBadge = renderBadge;
+})();
+</script>
 
 <script>
   // ==== Configuração básica ====
@@ -241,7 +371,6 @@
   const CART_KEY = 'cart:v1';
   const LAST_ORDER_KEY = 'order:last';
 
-  // Chaves possíveis para recuperar o token JWT
   const TOKEN_KEYS = ['access', 'token', 'token2'];
   function getToken() {
     for (const k of TOKEN_KEYS) {
@@ -255,9 +384,6 @@
   const jwt = getToken();
   if (jwt) baseHeaders.Authorization = `Bearer ${jwt}`;
 
-  /**
-   * Lê o carrinho do localStorage.
-   */
   function loadCart() {
     try {
       return JSON.parse(localStorage.getItem(CART_KEY)) || { items: [] };
@@ -266,113 +392,130 @@
     }
   }
 
-  /**
-   * Guarda o último pedido feito (para mostrar em pedido.html, por exemplo).
-   */
-  function saveLastOrder(order) {
-    localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
+  function calcTotal(items) {
+    return items.reduce(
+      (acc, it) => acc + (Number(it.unitPrice || 0) * Number(it.qty || 0)),
+      0
+    );
   }
 
-  /**
-   * Limpa o carrinho após pedido concluído.
-   */
-  function clearCart() {
-    localStorage.removeItem(CART_KEY);
-    if (window.updateCartCountBadge) window.updateCartCountBadge();
-  }
-
-  /**
-   * Coleta dados do formulário de pagamento e monta o payload que será enviado ao backend.
-   * Aqui você pode ajustar os campos conforme o serializer da sua API de pedidos.
-   */
-  function buildOrderPayload() {
-    const nome     = document.getElementById('nome')?.value?.trim() || '';
-    const email    = document.getElementById('email')?.value?.trim() || '';
-    const documento = document.getElementById('documento')?.value?.trim() || '';
-
-    const pagamento = document.querySelector('input[name="pagamento"]:checked')?.value || 'pix';
-
-    const cart = loadCart();
-    const itens = (cart.items || []).map(it => ({
-      evento_id: it.id,
-      quantidade: it.qty,
-      preco_unitario: it.preco
-    }));
+  function buildPedidoPayloadFromCart(cartState) {
+    const pagamento = document.querySelector('input[name="pagamento"]:checked')?.value || 'credito';
 
     return {
-      nome,
-      email,
-      documento,
-      forma_pagamento: pagamento,
-      itens
+      forma_pagamento: pagamento,               // backend: Pedido.forma_pagamento
+      observacoes: `Pagamento via ${pagamento.toUpperCase()} - app`, // opcional
+      itens: (cartState.items || []).map(it => ({
+        // mapeia 1:1 cada linha do carrinho para um item do pedido
+        evento_id: it.eventoId,                 // precisa existir no carrinho
+        quantidade: Number(it.qty || 0),
+        // separa ingresso x excursão usando o "kind" que você já usa no carrinho
+        preco_ingresso: it.kind === 'ingresso' ? Number(it.unitPrice || 0) : 0,
+        preco_excursao: it.kind === 'excursao' ? Number(it.unitPrice || 0) : 0
+      }))
     };
   }
 
-  /**
-   * Validação básica de front: garante que nome, e-mail, documento e carrinho estejam preenchidos.
-   */
-  function validateOrder(payload) {
-    if (!payload.nome) return 'Informe o nome completo.';
-    if (!payload.email) return 'Informe o e-mail.';
-    if (!payload.documento) return 'Informe CPF ou documento.';
-    if (!payload.itens || !payload.itens.length) return 'Seu carrinho está vazio.';
+  function buildOrderSnapshot(pedido, cartState) {
+    // Se o backend devolver os itens, usamos; senão, usamos o snapshot do carrinho
+    const backendItems = Array.isArray(pedido.itens) ? pedido.itens : null;
 
-    return null;
+    let items;
+    if (backendItems) {
+      items = backendItems.map(pi => {
+        const unit = Number(pi.subtotal || 0) / (Number(pi.quantidade || 1) || 1);
+        return {
+          name: pi.evento_nome || 'Ingresso',
+          unitPrice: unit,
+          qty: Number(pi.quantidade || 1),
+          kind: null,
+          eventoId: pi.evento || null
+        };
+      });
+    } else {
+      items = (cartState.items || []).map(it => ({
+        name: it.name,
+        unitPrice: Number(it.unitPrice || 0),
+        qty: Number(it.qty || 0),
+        kind: it.kind || null,
+        eventoId: it.eventoId || null
+      }));
+    }
+
+    return {
+      id: pedido.id || pedido.codigo || null,          // id do pedido no backend
+      backendId: pedido.id || null,
+      items,
+      currency: 'BRL',
+      total: Number(pedido.valor_total ?? cartState.total ?? calcTotal(cartState.items || [])),
+      createdAt: pedido.criado_em || new Date().toISOString()
+    };
   }
 
-  /**
-   * Envia o pedido para a API usando fetch.
-   * Em caso de sucesso, limpa o carrinho e redireciona para pedido.html.
-   */
   async function enviarPedido() {
-    const payload = buildOrderPayload();
-    const errorMessage = validateOrder(payload);
-    if (errorMessage) {
-      alert(errorMessage);
+    const cartState = loadCart();
+
+    if (!cartState.items || !cartState.items.length) {
+      alert('Seu carrinho está vazio. Volte e adicione algum item antes de pagar.');
+      return;
+    }
+
+    const payload = buildPedidoPayloadFromCart(cartState);
+
+    // validação básica: não mandar itens com quantidade 0
+    payload.itens = payload.itens.filter(it => it.quantidade > 0 && it.evento_id);
+
+    if (!payload.itens.length) {
+      alert('Não foi possível montar o pedido. Tente adicionar os itens novamente.');
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE}/pedidos/`, {
+      const resp = await fetch(`${API_BASE}/pedidos/`, {
         method: 'POST',
         headers: {
           ...baseHeaders,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
 
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        console.error('Erro ao criar pedido:', data);
-        const msg =
-          data.detail ||
-          data.non_field_errors?.[0] ||
-          'Não foi possível criar o pedido. Tente novamente.';
+      if (!resp.ok) {
+        let msg = 'Erro ao criar o pedido.';
+        try {
+          const errData = await resp.json();
+          console.error('Erro backend /api/pedidos/:', errData);
+          msg += '\n\nDetalhes: ' + JSON.stringify(errData, null, 2);
+        } catch {
+          console.error('Erro backend /api/pedidos/ (sem JSON)');
+        }
         alert(msg);
         return;
       }
 
-      // Guarda o pedido retornado e limpa o carrinho
-      saveLastOrder(data);
-      clearCart();
+      const pedido = await resp.json();
+      console.log('Pedido criado com sucesso:', pedido);
 
-      // Redireciona para a página de confirmação
+      // monta snapshot para página pedido.html
+      const orderSnapshot = buildOrderSnapshot(pedido, cartState);
+
+      // salva e limpa carrinho
+      localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(orderSnapshot));
+      localStorage.removeItem(CART_KEY);
+
+      // redireciona para tela de pedido
       window.location.href = 'pedido.html';
     } catch (err) {
-      console.error(err);
+      console.error('Erro de rede ao criar pedido:', err);
       alert('Erro de conexão ao criar o pedido. Verifique sua internet ou o servidor e tente novamente.');
     }
   }
 
-  // Botão "Finalizar pagamento"
   document.getElementById('btn-finalizar')?.addEventListener('click', function (e) {
     e.preventDefault();
     enviarPedido();
   });
 </script>
-
 
 
 <script src="js/cart-badge.js"></script>
