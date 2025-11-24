@@ -9,7 +9,19 @@ User = get_user_model()
 
 
 class PerfilModelTest(TestCase):
+    """
+    Testes unitários para o modelo Perfil.
+
+    Cobre:
+    - criação básica de Perfil
+    - constraint de unicidade do CPF
+    - campos opcionais (telefone e endereço).
+    """
+
     def setUp(self):
+        """
+        Cria um usuário base para associar ao Perfil nos testes.
+        """
         self.user = User.objects.create_user(
             username="joaosilva",
             email="joao.silva@example.com",
@@ -19,6 +31,9 @@ class PerfilModelTest(TestCase):
         )
 
     def test_criacao_perfil(self):
+        """
+        Cria um Perfil completo e verifica campos e __str__().
+        """
         perfil = Perfil.objects.create(
             user=self.user,
             cpf="123.456.789-00",
@@ -34,6 +49,9 @@ class PerfilModelTest(TestCase):
         self.assertEqual(str(perfil), "João Silva (123.456.789-00)")
 
     def test_cpf_unico(self):
+        """
+        Garante que o campo CPF é único entre perfis (UNIQUE constraint).
+        """
         Perfil.objects.create(
             user=self.user,
             cpf="123.456.789-00",
@@ -52,6 +70,10 @@ class PerfilModelTest(TestCase):
             )
 
     def test_telefone_e_endereco_opcionais(self):
+        """
+        Telefone e endereço podem ser nulos e a relação reversa user.perfil
+        deve continuar funcionando.
+        """
         perfil = Perfil.objects.create(
             user=self.user,
             cpf="987.654.321-00",

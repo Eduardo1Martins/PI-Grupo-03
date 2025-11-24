@@ -174,34 +174,53 @@
 
 
 
- <script>
+<script>
 (function () {
+  // URL base da API (ajuste para produção se necessário)
   const API_BASE = 'http://localhost:8000/api';
 
+  // Chaves possíveis onde o JWT pode estar salvo no localStorage
   const TOKEN_KEYS = ['token', 'token2'];
+
+  /**
+   * Busca o primeiro token JWT válido salvo no localStorage.
+   * Retorna a string do token (sem aspas) ou null.
+   */
   function getToken() {
     for (const k of TOKEN_KEYS) {
       const v = localStorage.getItem(k);
-      if (v) return String(v).replace(/^"|"$/g, '');
+      if (v) return String(v).replace(/^"|"$/g, ''); // remove aspas extras
     }
     return null;
   }
+
+  // Cabeçalhos base usados nas requisições à API
   const baseHeaders = { Accept: 'application/json' };
   const jwt = getToken();
   if (jwt) baseHeaders.Authorization = `Bearer ${jwt}`;
 
-  const listEl   = document.getElementById('events-list');          
-  const searchEl = document.querySelector('.input-group input');     
-  const bannerEl = document.querySelector('.banner-container');      
+  // Elementos principais da página
+  const listEl   = document.getElementById('events-list');          // container dos cards
+  const searchEl = document.querySelector('.input-group input');    // input de busca
+  const bannerEl = document.querySelector('.banner-container');     // banner rotativo
 
+  // Array local com todos os eventos carregados da API
   let allEvents = [];
 
- async function fetchEventos() {
-  const urlAll = `${API_BASE}/eventos/?ordering=-data&scope=all`;
-  const listAll = await getList(urlAll);
-  return { eventos: listAll, fromPast: false };
-}
+  /**
+   * Busca todos os eventos na API.
+   * Retorna um objeto { eventos, fromPast } para possível expansão futura.
+   */
+  async function fetchEventos() {
+    const urlAll = `${API_BASE}/eventos/?ordering=-data&scope=all`;
+    const listAll = await getList(urlAll);
+    return { eventos: listAll, fromPast: false };
+  }
 
+  /**
+   * Função auxiliar genérica para buscar uma lista na API.
+   * Aceita API que retorna array direto ou paginado em { results: [] }.
+   */
   async function getList(url) {
     const r = await fetch(url, { headers: baseHeaders });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -209,17 +228,22 @@
     return Array.isArray(j) ? j : (j.results || []);
   }
 
+  // Carrega eventos ao iniciar a página
   fetchEventos()
     .then(({ eventos }) => {
       allEvents = eventos;
-      renderList(allEvents);
-      buildBanner(allEvents);
+      renderList(allEvents);   // renderiza cards principais
+      buildBanner(allEvents);  // monta banner rotativo
     })
     .catch((err) => {
       console.error('Erro ao carregar eventos:', err);
       renderEmpty('Não foi possível carregar os eventos.');
     });
 
+  /**
+   * Renderiza a lista de eventos na tela.
+   * Se o array estiver vazio, mostra mensagem amigável.
+   */
   function renderList(events) {
     listEl.innerHTML = '';
     if (!events.length) {
@@ -229,10 +253,17 @@
     for (const ev of events) listEl.appendChild(makeCard(ev));
   }
 
+  /**
+   * Renderiza apenas um texto centralizado em caso de lista vazia/erro.
+   */
   function renderEmpty(msg) {
     listEl.innerHTML = `<p class="text-center text-muted">${msg}</p>`;
   }
 
+  /**
+   * Cria dinamicamente um card de evento usando DOM API.
+   * O card é clicável e redireciona para ingresso.html com o id do evento.
+   */
   function makeCard(ev) {
     const { id, nome, cidade, local, data, imagem, preco } = ev;
 
@@ -256,25 +287,32 @@
 
     const pLoc = document.createElement('p');
     pLoc.className = 'card-text';
-    pLoc.textContent = [cidade,].filter(Boolean).join(' - ');
+    // aqui só cidade (local completo fica na tela de detalhes)
+    pLoc.textContent = [cidade].filter(Boolean).join(' - ');
 
     left.append(h5, pLoc);
 
     const right = document.createElement('div');
     const pDate = document.createElement('p');
     pDate.className = 'fw-semibold mb-1';
-    pDate.textContent = formatDateBR(data);
+    pDate.textContent = formatDateBR(data); // data formatada dd/mm
 
     const pPrice = document.createElement('small');
     pPrice.className = 'text-muted';
-    if (preco !== null && preco !== undefined && preco !== '')
-      pPrice.textContent = Number(preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    if (preco !== null && preco !== undefined && preco !== '') {
+      pPrice.textContent = Number(preco).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
 
     right.append(pDate);
+    // se quiser exibir o preço aqui, pode fazer: right.append(pDate, pPrice);
 
     body.append(left, right);
     card.append(img, body);
 
+    // Ao clicar no card, vai para a página de ingresso com o id na querystring
     card.addEventListener('click', () => {
       window.location.href = `ingresso.html?evento=${encodeURIComponent(id)}`;
     });
@@ -282,18 +320,24 @@
     return card;
   }
 
-function formatDateBR(iso) {
-  if (!iso) return '';
-  const [y, m, d] = String(iso).split('-').map(Number);
-  if (!y || !m || !d) return '';
-  const date = new Date(y, m - 1, d);
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit'
-  }).format(date);
-}
- 
+  /**
+   * Formata string de data ISO (yyyy-mm-dd) para formato BR (dd/mm).
+   */
+  function formatDateBR(iso) {
+    if (!iso) return '';
+    const [y, m, d] = String(iso).split('-').map(Number);
+    if (!y || !m || !d) return '';
+    const date = new Date(y, m - 1, d);
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit'
+    }).format(date);
+  }
 
+  /**
+   * Monta o banner rotativo no topo da página, usando eventos que possuem imagem.
+   * Faz um mini "slider" com auto-play, setas e navegação por teclado.
+   */
   function buildBanner(events) {
     if (!bannerEl) return;
 
@@ -301,6 +345,7 @@ function formatDateBR(iso) {
     const titleEl    = bannerEl.querySelector('.banner-text h5');
     const subtitleEl = bannerEl.querySelector('.banner-text small');
 
+    // Filtra apenas eventos com imagem e limita a 8 slides
     const slides = events
       .filter(e => !!e.imagem)
       .slice(0, 8)
@@ -312,11 +357,18 @@ function formatDateBR(iso) {
 
     if (!slides.length || !imgEl || !titleEl || !subtitleEl) return;
 
-    slides.forEach(s => { const pre = new Image(); pre.src = s.src; });
+    // Pré-carrega as imagens para evitar "flash" na troca
+    slides.forEach(s => {
+      const pre = new Image();
+      pre.src = s.src;
+    });
 
     let i = 0;
-    const INTERVAL_MS = 3000;
+    const INTERVAL_MS = 3000; // tempo entre slides
 
+    /**
+     * Aplica os dados de um slide (imagem + textos) no DOM do banner.
+     */
     function applySlide(s) {
       imgEl.src = s.src;
       imgEl.alt = s.title;
@@ -324,9 +376,12 @@ function formatDateBR(iso) {
       subtitleEl.textContent = s.subtitle;
     }
 
-    applySlide(slides[0]);
+    // Inicia com o primeiro slide
+    applySlide(slides[i]);
 
+    // Timer para auto-avançar o slider
     let timer = setInterval(nextSlide, INTERVAL_MS);
+
     function nextSlide() {
       i = (i + 1) % slides.length;
       applySlide(slides[i]);
@@ -340,25 +395,40 @@ function formatDateBR(iso) {
       timer = setInterval(nextSlide, INTERVAL_MS);
     }
 
+    /**
+     * Cria botão de navegação do slider (esquerda/direita) posicionado no banner.
+     */
     function makeBtn(side, label, clickFn) {
       const b = document.createElement('button');
       b.type = 'button';
       b.setAttribute('aria-label', label);
       Object.assign(b.style, {
-        position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-        [side]: '10px', width: '40px', height: '40px', border: 'none',
-        borderRadius: '50%', background: 'rgba(0,0,0,0.45)', color: '#fff',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', zIndex: '5'
+        position: 'absolute',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        [side]: '10px',
+        width: '40px',
+        height: '40px',
+        border: 'none',
+        borderRadius: '50%',
+        background: 'rgba(0,0,0,0.45)',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        zIndex: '5'
       });
       b.innerHTML = side === 'left' ? '&larr;' : '&rarr;';
       b.addEventListener('click', () => { clickFn(); resetTimer(); });
       return b;
     }
-    const leftBtn  = makeBtn('left',  'Anterior', prevSlide);
-    const rightBtn = makeBtn('right', 'Próximo',  nextSlide);
+
+    const leftBtn  = makeBtn('left',  'Anterior', nextSlide);
+    const rightBtn = makeBtn('right', 'Próximo',  prevSlide);
     bannerEl.append(leftBtn, rightBtn);
 
+    // Acessibilidade: permite navegar no slider com setas do teclado
     bannerEl.tabIndex = 0;
     bannerEl.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft')  { prevSlide();  resetTimer(); }
@@ -366,6 +436,10 @@ function formatDateBR(iso) {
     });
   }
 
+  /**
+   * Busca simples de texto: filtra eventos pelo que foi digitado
+   * (nome, cidade, local ou descrição).
+   */
   if (searchEl) {
     let t;
     searchEl.addEventListener('input', () => {
@@ -373,16 +447,20 @@ function formatDateBR(iso) {
       t = setTimeout(() => {
         const q = searchEl.value.trim().toLowerCase();
         if (!q) return renderList(allEvents);
+
         const filtered = allEvents.filter(e => {
-          const campos = [e.nome, e.cidade, e.local, e.descricao].map(v => (v || '').toLowerCase());
+          const campos = [e.nome, e.cidade, e.local, e.descricao]
+            .map(v => (v || '').toLowerCase());
           return campos.some(v => v.includes(q));
         });
+
         renderList(filtered);
-      }, 150);
+      }, 150); // debounce de 150ms evita chamadas excessivas
     });
   }
 })();
 </script>
+
 
 
 <script src="js/cart-badge.js"></script>

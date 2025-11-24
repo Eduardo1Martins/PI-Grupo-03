@@ -156,37 +156,112 @@
 
   <div class="divider"></div>
 
-  <div class="card-section">
+    <div class="card-section">
     <h6>Dados Pessoais</h6>
 
-    <form method="post">
-        <div class="mb-3">
-        <input type="text" class="form-control" placeholder="Nome" required>
-      </div>
+    <!-- Caixa de alertas para mensagens de erro/sucesso -->
+    <div id="accountAlert" class="alert d-none" role="alert"></div>
+
+    <form id="accountForm" novalidate>
       <div class="mb-3">
-        <input type="email" class="form-control" placeholder="E-mail" required>
+        <input
+          id="nome"
+          name="nome"
+          type="text"
+          class="form-control"
+          placeholder="Nome"
+          required
+        >
       </div>
+
       <div class="mb-3">
-        <input type="text" class="form-control" placeholder="Endereço" required>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          class="form-control"
+          placeholder="E-mail"
+          required
+        >
       </div>
+
       <div class="mb-3">
-        <input id="telefone" type="tel" class="form-control" placeholder="Telefone" pattern="(\d{2})\s?\d{4,5}-\d{4}" required>
+        <input
+          id="telefone"
+          name="telefone"
+          type="tel"
+          class="form-control"
+          placeholder="Telefone"
+          required
+        >
       </div>
-      <div class="mb-4">
-        <input type="password" class="form-control" placeholder="Senha" required>
-      </div>
+
       <div class="buttons">
-      <button type="submit" class="btn btn-login w-50">Editar</button>
-      <button type="submit" class="btn btn-login w-50">Salvar</button>
+        <button id="btnEditar" type="button" class="btn btn-login w-50">Editar</button>
+        <button id="btnSalvar" type="button" class="btn btn-login w-50">Salvar</button>
       </div>
     </form>
+  </div>
+
+  <!-- Seção de troca de senha -->
+  <div class="card-section mt-4">
+    
+    <!-- Alertas específicos da troca de senha -->
+    <div id="passwordAlert" class="alert d-none" role="alert"></div>
+
+    <!-- Formulário de troca de senha, escondido por padrão -->
+    <div id="passwordFormContainer" class="d-none">
+      <h6>Trocar senha</h6>
+      <form id="passwordForm" novalidate>
+        <div class="mb-3">
+          <input
+            id="oldPassword"
+            name="oldPassword"
+            type="password"
+            class="form-control"
+            placeholder="Senha atual"
+            required
+          >
+        </div>
+
+        <div class="mb-3">
+          <input
+            id="newPassword"
+            name="newPassword"
+            type="password"
+            class="form-control"
+            placeholder="Nova senha"
+            required
+          >
+        </div>
+
+        <div class="mb-4">
+          <input
+            id="newPasswordConfirm"
+            name="newPasswordConfirm"
+            type="password"
+            class="form-control"
+            placeholder="Confirme a nova senha"
+            required
+          >
+        </div>
+
+        <div class="buttons">
+          <button id="btnChangePassword" type="button" class="btn btn-login w-100">
+            Alterar senha
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 
 <script>
 (function () {
   const CART_KEY = 'cart:v1';
   const badgeEl = document.getElementById('cart-count-badge');
   if (!badgeEl) return;
-
+  // Return total quantity of items currently stored in the cart state
   function getCount() {
     try {
       const state = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}');
@@ -194,6 +269,7 @@
     } catch { return 0; }
   }
 
+  // Update the visible badge element to show the current cart item count
   function renderBadge() {
     const n = getCount();
     badgeEl.textContent = n;
@@ -203,6 +279,7 @@
   renderBadge();
   window.addEventListener('storage', (e) => { if (e.key === CART_KEY) renderBadge(); });
 
+  // If a global CartStore is present, wrap its save() to refresh the badge after saves
   if (window.CartStore && typeof window.CartStore.save === 'function') {
     const originalSave = window.CartStore.save.bind(window.CartStore);
     window.CartStore.save = function (state) {
@@ -212,9 +289,340 @@
     };
   }
 
+  // Expose a helper so other scripts can trigger a badge update
   window.updateCartCountBadge = renderBadge;
 })();
 </script>
+
+<script>
+  const API_BASE = 'http://localhost:8000/api';
+
+  /**
+   * Recupera o token JWT do localStorage.
+   * Considera algumas chaves possíveis usadas no projeto.
+   */
+  function getToken() {
+    const keys = ['access', 'token', 'token2'];
+    for (const k of keys) {
+      const v = localStorage.getItem(k);
+      if (v) return String(v).replace(/^"|"$/g, '');
+    }
+    return null;
+  }
+
+  /**
+   * Alertas da parte de dados pessoais.
+   */
+  function showAccountAlert(message, type = 'danger') {
+    const box = document.getElementById('accountAlert');
+    if (!box) return;
+    box.textContent = message;
+    box.className = `alert alert-${type}`;
+  }
+
+  function clearAccountAlert() {
+    const box = document.getElementById('accountAlert');
+    if (!box) return;
+    box.textContent = '';
+    box.className = 'alert d-none';
+  }
+
+  /**
+   * Alertas da parte de troca de senha.
+   */
+  function showPasswordAlert(message, type = 'danger') {
+    const box = document.getElementById('passwordAlert');
+    if (!box) return;
+    box.textContent = message;
+    box.className = `alert alert-${type}`;
+  }
+
+  function clearPasswordAlert() {
+    const box = document.getElementById('passwordAlert');
+    if (!box) return;
+    box.textContent = '';
+    box.className = 'alert d-none';
+  }
+
+  /**
+   * Habilita / desabilita campos do formulário de Dados Pessoais.
+   * Usamos readOnly para manter o estilo, mas evitar edição.
+   */
+  function setFormDisabled(disabled) {
+    ['nome', 'email', 'telefone'].forEach((id) => {
+      const input = document.getElementById(id);
+      if (input) input.readOnly = disabled;
+    });
+  }
+
+  /**
+   * Divide o nome completo em first_name e last_name.
+   */
+  function splitNomeCompleto(nome) {
+    const parts = (nome || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return { first_name: '', last_name: '' };
+    if (parts.length === 1) return { first_name: parts[0], last_name: '' };
+    return {
+      first_name: parts[0],
+      last_name: parts.slice(1).join(' '),
+    };
+  }
+
+  /**
+   * Carrega os dados do usuário em /usuarios/me/ e preenche o formulário.
+   */
+  async function carregarPerfil() {
+    clearAccountAlert();
+
+    const token = getToken();
+    if (!token) {
+      // Sem token -> redireciona para login
+      window.location.href = 'login.html';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/usuarios/me/`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 401) {
+        // Token inválido/expirado
+        window.location.href = 'login.html';
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      // Monta nome completo a partir de first_name + last_name
+      const nomeCompleto = [data.first_name, data.last_name]
+        .filter(Boolean)
+        .join(' ');
+
+      document.getElementById('nome').value     = nomeCompleto;
+      document.getElementById('email').value    = data.email || '';
+      document.getElementById('telefone').value = data.telefone || '';
+
+      // Campos começam desabilitados (somente leitura)
+      setFormDisabled(true);
+    } catch (err) {
+      console.error(err);
+      showAccountAlert(
+        'Não foi possível carregar seus dados. Tente novamente mais tarde.',
+        'danger'
+      );
+    }
+  }
+
+  /**
+   * Envia as alterações de Nome / E-mail / Telefone para o backend via PATCH.
+   */
+  async function salvarPerfil() {
+    clearAccountAlert();
+
+    const token = getToken();
+    if (!token) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    const nomeInput     = document.getElementById('nome');
+    const emailInput    = document.getElementById('email');
+    const telefoneInput = document.getElementById('telefone');
+
+    const nome     = (nomeInput.value || '').trim();
+    const email    = (emailInput.value || '').trim();
+    const telefone = (telefoneInput.value || '').trim();
+
+    if (!nome)  return showAccountAlert('Informe seu nome.', 'warning');
+    if (!email) return showAccountAlert('Informe seu e-mail.', 'warning');
+
+    const { first_name, last_name } = splitNomeCompleto(nome);
+
+    // Payload compatível com PerfilSerializer (campos de user + perfil "achatados")
+    const payload = {
+      first_name,
+      last_name,
+      email,
+      telefone,
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/usuarios/me/`, {
+        method: 'PATCH',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        console.error('Erro ao atualizar perfil:', data);
+        const msg =
+          data.detail ||
+          (Array.isArray(data.non_field_errors) && data.non_field_errors[0]) ||
+          'Não foi possível salvar seus dados. Verifique os campos e tente novamente.';
+        showAccountAlert(msg, 'danger');
+        return;
+      }
+
+      showAccountAlert('Dados atualizados com sucesso!', 'success');
+      setFormDisabled(true);
+    } catch (err) {
+      console.error(err);
+      showAccountAlert(
+        'Erro de conexão ao salvar seus dados. Tente novamente.',
+        'danger'
+      );
+    }
+  }
+
+  /**
+   * Troca de senha via /auth/change-password/.
+   */
+  async function trocarSenha() {
+    clearPasswordAlert();
+
+    const token = getToken();
+    if (!token) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    const oldInput  = document.getElementById('oldPassword');
+    const newInput  = document.getElementById('newPassword');
+    const confInput = document.getElementById('newPasswordConfirm');
+
+    const oldPassword        = (oldInput?.value || '').trim();
+    const newPassword        = (newInput?.value || '').trim();
+    const newPasswordConfirm = (confInput?.value || '').trim();
+
+    if (!oldPassword)
+      return showPasswordAlert('Informe sua senha atual.', 'warning');
+    if (!newPassword)
+      return showPasswordAlert('Informe a nova senha.', 'warning');
+    if (!newPasswordConfirm)
+      return showPasswordAlert('Confirme a nova senha.', 'warning');
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/change-password/`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          old_password: oldPassword,
+          new_password: newPassword,
+          new_password_confirm: newPasswordConfirm,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        console.error('Erro ao trocar senha:', data);
+        let msg = data.detail;
+        if (!msg && typeof data === 'object' && data !== null) {
+          const firstKey = Object.keys(data)[0];
+          if (firstKey && Array.isArray(data[firstKey]) && data[firstKey][0]) {
+            msg = data[firstKey][0];
+          }
+        }
+        showPasswordAlert(
+          msg || 'Não foi possível alterar a senha. Verifique os dados e tente novamente.',
+          'danger'
+        );
+        return;
+      }
+
+      showPasswordAlert('Senha alterada com sucesso. Faça login novamente.', 'success');
+
+      if (oldInput)  oldInput.value  = '';
+      if (newInput)  newInput.value  = '';
+      if (confInput) confInput.value = '';
+
+      // Força logout: remove tokens locais
+      ['access', 'refresh', 'token', 'token2'].forEach((k) =>
+        localStorage.removeItem(k)
+      );
+
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      showPasswordAlert(
+        'Erro de conexão ao tentar alterar a senha. Tente novamente.',
+        'danger'
+      );
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Carrega os dados do usuário assim que abrir a página
+    carregarPerfil();
+
+    // Botão "Editar" de Dados Pessoais: habilita os campos
+    const btnEditar = document.getElementById('btnEditar');
+    if (btnEditar) {
+      btnEditar.addEventListener('click', (e) => {
+        e.preventDefault();
+        clearAccountAlert();
+        setFormDisabled(false);
+        document.getElementById('nome')?.focus();
+        const container = document.getElementById('passwordFormContainer');
+        if (container) container.classList.remove('d-none');
+        document.getElementById('oldPassword')?.focus();
+      });
+    }
+
+    // Botão "Salvar" de Dados Pessoais
+    const btnSalvar = document.getElementById('btnSalvar');
+    if (btnSalvar) {
+      btnSalvar.addEventListener('click', (e) => {
+        e.preventDefault();
+        salvarPerfil();
+      });
+    }
+
+    // Evita submit padrão do form de dados pessoais
+    const accountForm = document.getElementById('accountForm');
+    if (accountForm) {
+      accountForm.addEventListener('submit', (e) => e.preventDefault());
+    }
+
+    // Botão "Alterar senha" envia para /auth/change-password/
+    const btnChangePassword = document.getElementById('btnChangePassword');
+    if (btnChangePassword) {
+      btnChangePassword.addEventListener('click', (e) => {
+        e.preventDefault();
+        trocarSenha();
+      });
+    }
+
+    // Evita submit padrão do form de senha
+    const passwordForm = document.getElementById('passwordForm');
+    if (passwordForm) {
+      passwordForm.addEventListener('submit', (e) => e.preventDefault());
+    }
+  });
+</script>
+
+
 
 
 <script src="js/cart-badge.js"></script>

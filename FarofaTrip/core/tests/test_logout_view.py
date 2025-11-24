@@ -7,7 +7,20 @@ User = get_user_model()
 
 
 class LogoutViewTests(APITestCase):
+    """
+    Testes da LogoutView (endpoint /auth/logout/).
+
+    Cobre:
+    - blacklist de refresh token válido
+    - comportamento com token inválido
+    - ausência de campo 'refresh'.
+    """
+
     def setUp(self):
+        """
+        Cria um usuário e define as URLs auxiliares:
+        login, refresh e logout.
+        """
         self.user = User.objects.create_user(
             username="user1",
             email="user1@example.com",
@@ -20,7 +33,11 @@ class LogoutViewTests(APITestCase):
         self.logout_url = reverse("api_logout")
 
     def _get_tokens(self):
-        """Helper para obter access/refresh via endpoint de login."""
+        """
+        Helper para obter access/refresh via endpoint de login.
+
+        Retorna: (access, refresh)
+        """
         resp = self.client.post(
             self.login_url,
             {"username": "user1", "password": "StrongPass123!"},

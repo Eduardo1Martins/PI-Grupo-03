@@ -184,10 +184,11 @@
 
 
   <script>
-  const CART_KEY = 'cart:v1';
-  const LAST_ORDER_KEY = 'order:last';
+  const CART_KEY = 'cart:v1';           // não usado aqui, mas mantido se precisar
+  const LAST_ORDER_KEY = 'order:last';  // chave onde o pedido foi salvo
   const money = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
+  // Abstração mínima para o carrinho (aqui só limpeza, se necessário)
   const CartStore = {
     load() {
       try { return JSON.parse(localStorage.getItem(CART_KEY)) || { items: [] }; }
@@ -196,91 +197,63 @@
     clear() { localStorage.removeItem(CART_KEY); }
   };
 
-  const OrderStore = {
-    load() {
-      try { return JSON.parse(localStorage.getItem(LAST_ORDER_KEY)) || null; }
-      catch { return null; }
-    },
-    save(order) {
-      order.updatedAt = new Date().toISOString();
-      localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
-    },
-    clear() { localStorage.removeItem(LAST_ORDER_KEY); }
-  };
-
-  function calcTotal(items) {
-    return items.reduce((acc, it) => acc + (Number(it.unitPrice) * Number(it.qty)), 0);
+  /**
+   * Recupera o último pedido salvo em LAST_ORDER_KEY.
+   */
+  function loadLastOrder() {
+    try {
+      return JSON.parse(localStorage.getItem(LAST_ORDER_KEY)) || null;
+    } catch {
+      return null;
+    }
   }
 
-  function genOrderId() {
-    const d = new Date();
-    const dd = String(d.getFullYear()).slice(2) + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const rand = () => letters[Math.floor(Math.random()*letters.length)];
-    const num  = () => Math.floor(Math.random()*10);
-    return `${dd}-${rand()}${rand()}${num()}${num()}`;
-  }
-
-  function snapshotFromCart() {
-    const cart = CartStore.load();
-    if (!cart.items?.length) return null;
-    const order = {
-      id: genOrderId(),
-      items: cart.items.map(it => ({
-        id: it.id,
-        name: it.name,
-        unitPrice: Number(it.unitPrice),
-        qty: Number(it.qty),
-        kind: it.kind,
-        eventoId: it.eventoId || null
-      })),
-      currency: 'BRL',
-      total: calcTotal(cart.items),
-      createdAt: new Date().toISOString()
-    };
-    OrderStore.save(order);
-    CartStore.clear();
-    return order;
-  }
-
-  function ensureOrder() {
-    let order = OrderStore.load();
-    if (order && Array.isArray(order.items) && order.items.length) return order;
- 
-    return snapshotFromCart();
-  }
-
-  function renderOrder(order) {
-    const idEl = document.getElementById('order-id');
-    const itemsEl = document.getElementById('order-items');
-    const totalEl = document.getElementById('order-total');
-
-    if (!order || !order.items?.length) {
-      idEl.textContent = '#----';
-      itemsEl.innerHTML = '<p class="text-secondary mb-0">Nenhum item encontrado para este pedido.</p>';
-      totalEl.textContent = money.format(0);
+  /**
+   * Renderiza o resumo do pedido: itens, total, dados do cliente, etc.
+   */
+  function renderOrder() {
+    const order = loadLastOrder();
+    if (!order) {
+      document.getElementById('order-empty')?.classList.remove('d-none');
+      document.getElementById('order-content')?.classList.add('d-none');
       return;
     }
 
-    idEl.textContent = `#${order.id}`;
-    itemsEl.innerHTML = '';
+    const content = document.getElementById('order-content');
+    content.classList.remove('d-none');
+    document.getElementById('order-empty')?.classList.add('d-none');
 
-    order.items.forEach(it => {
-      const line = document.createElement('div');
-      line.className = 'item-line';
-      line.innerHTML = `
-        <span>${it.name}</span>
-        <span class="price">${it.qty}x ${money.format(it.unitPrice)}</span>
-      `;
-      itemsEl.appendChild(line);
-    });
+    // Exemplo: adapta aos campos da resposta da sua API (/pedidos/)
+    document.getElementById('order-id').textContent = order.id ?? '';
+    document.getElementById('order-nome').textContent = order.nome ?? '';
+    document.getElementById('order-email').textContent = order.email ?? '';
+    document.getElementById('order-documento').textContent = order.documento ?? '';
 
-    totalEl.textContent = money.format(order.total);
+    const itemsContainer = document.getElementById('order-items');
+    itemsContainer.innerHTML = '';
+
+    const itens = order.itens || order.items || [];
+    let total = 0;
+
+    for (const it of itens) {
+      const li = document.createElement('li');
+      const nome = it.nome_evento || it.evento_nome || it.nome || 'Ingresso';
+      const qtd  = it.quantidade || it.qty || 1;
+      const preco = parseFloat(it.preco_unitario || it.preco || 0);
+
+      const subtotal = preco * qtd;
+      total += subtotal;
+
+      li.textContent = `${nome} x${qtd} - ${money.format(subtotal)}`;
+      itemsContainer.appendChild(li);
+    }
+
+    document.getElementById('order-total').textContent = money.format(total);
   }
 
-  const order = ensureOrder();
-  renderOrder(order);
+  document.addEventListener('DOMContentLoaded', renderOrder);
 </script>
+
 
 <script>
 (function () {

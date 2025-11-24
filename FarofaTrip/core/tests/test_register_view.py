@@ -9,7 +9,21 @@ User = get_user_model()
 
 
 class RegisterViewTests(APITestCase):
+    """
+    Testes de integração para o endpoint de registro (/auth/register/).
+
+    Cobre:
+    - criação bem-sucedida de User + Perfil
+    - validação de e-mail duplicado
+    - validação de CPF duplicado
+    - validação de senha fraca
+    - payload incompleto.
+    """
+
     def setUp(self):
+        """
+        Define a URL de registro e um payload base válido.
+        """
         self.url = reverse("api_register")
 
         # payload base VÁLIDO de acordo com o RegisterSerializer (campos planos)

@@ -9,7 +9,18 @@ from core.models import Evento
 
 
 class EventoViewSetTests(APITestCase):
+    """
+    Testes de integração para o EventoViewSet (API REST).
+
+    Cobre:
+    - filtragem por scope (future, past, all)
+    - busca (search)
+    - ordenação (ordering)
+    - criação, atualização e exclusão de eventos via API.
+    """
+
     def setUp(self):
+        # URL base da lista de eventos (gerada pelo router DRF)
         self.list_url = reverse("evento-list")
 
     def _cria_evento(
@@ -22,6 +33,10 @@ class EventoViewSetTests(APITestCase):
         ingresso="50.00",
         excursao="0.00",
     ):
+        """
+        Helper para criar eventos com valores padrão, permitindo sobrescritas.
+        Facilita a criação de cenários de teste.
+        """
         if data is None:
             data = date.today()
         return Evento.objects.create(
@@ -100,6 +115,7 @@ class EventoViewSetTests(APITestCase):
     def test_search_por_nome(self):
         """
         search deve filtrar por nome/cidade/local/descricao.
+        Aqui filtramos pelo termo 'Rock'.
         """
         self._cria_evento(nome="Festival de Rock", cidade="São Paulo")
         self._cria_evento(nome="Feira de Tecnologia", cidade="Campinas")
@@ -130,11 +146,12 @@ class EventoViewSetTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         nomes = [item["nome"] for item in response.data]
+        # a lista retornada deve estar em ordem alfabética
         self.assertEqual(nomes, sorted(nomes))
 
     def test_create_evento_cria_registro(self):
         """
-        POST /eventos/ deve criar um novo Evento.
+        POST /eventos/ deve criar um novo Evento com os campos enviados.
         """
         payload = {
             "nome": "Show de Teste",

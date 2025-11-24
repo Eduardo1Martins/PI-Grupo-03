@@ -7,7 +7,19 @@ User = get_user_model()
 
 
 class PerfilSerializerTestCase(TestCase):
+    """
+    Testes para o PerfilSerializer.
+
+    Cobre:
+    - representação combinada de User + Perfil
+    - update de campos de User e Perfil
+    - proteção ao campo id (somente leitura).
+    """
+
     def setUp(self):
+        """
+        Cria um usuário e um perfil de exemplo para ser usado nos testes.
+        """
         self.user = User.objects.create_user(
             username="usuario_teste",
             email="teste@example.com",
@@ -76,7 +88,7 @@ class PerfilSerializerTestCase(TestCase):
         old_id = self.user.id
 
         payload = {
-            "id": old_id + 1, 
+            "id": old_id + 1,  # tentativa de mudar o id do usuário
             "username": "usuario_mesmo_id",
             "email": "mesmoid@example.com",
             "cpf": "111.222.333-44",
@@ -89,8 +101,11 @@ class PerfilSerializerTestCase(TestCase):
         self.user.refresh_from_db()
         perfil_atualizado.refresh_from_db()
 
+        # id deve permanecer o mesmo
         self.assertEqual(self.user.id, old_id)
         self.assertEqual(perfil_atualizado.user.id, old_id)
+
+        # demais campos podem ser atualizados normalmente
         self.assertEqual(self.user.username, payload["username"])
         self.assertEqual(self.user.email, payload["email"])
         self.assertEqual(perfil_atualizado.cpf, payload["cpf"])

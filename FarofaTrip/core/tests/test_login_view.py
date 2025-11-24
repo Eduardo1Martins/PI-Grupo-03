@@ -8,7 +8,19 @@ User = get_user_model()
 
 
 class LoginViewTests(APITestCase):
+    """
+    Testes da LoginView (endpoint /auth/login/).
+
+    Cobre:
+    - login por username
+    - login por email (case-insensitive)
+    - erros para email inexistente, senha incorreta e falta de credenciais.
+    """
+
     def setUp(self):
+        """
+        Cria um usuário e guarda a URL do endpoint de login.
+        """
         self.user = User.objects.create_user(
             username="user1",
             email="user1@example.com",

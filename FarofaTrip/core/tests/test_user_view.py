@@ -9,7 +9,21 @@ User = get_user_model()
 
 
 class UsuarioViewSetTests(APITestCase):
+    """
+    Testes de integração para o ViewSet de usuários (/usuarios/).
+
+    Cobre:
+    - listagem de perfis
+    - detalhamento de um perfil
+    - criação de User + Perfil via POST
+    - atualização de dados de User e Perfil via PATCH
+    - remoção de Perfil via DELETE.
+    """
+
     def setUp(self):
+        """
+        Define a URL base da lista de usuários.
+        """
         self.list_url = reverse("usuario-list")
 
     def _cria_user_e_perfil(
@@ -22,6 +36,9 @@ class UsuarioViewSetTests(APITestCase):
         telefone="11999999999",
         endereco="Rua de Teste, 123",
     ):
+        """
+        Helper para criar rapidamente um User + Perfil para os cenários de teste.
+        """
         user = User.objects.create_user(
             username=username,
             email=email,

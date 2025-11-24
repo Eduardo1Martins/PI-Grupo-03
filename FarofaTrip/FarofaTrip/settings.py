@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-b7-voe=168x!%f@)dp(dsa@@*9#*y=0b%fq7416uslk+*5%1)-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.99.122', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -112,21 +112,19 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# CORS/CSRF para rodar o HTML em outra origem (ex.: file server, 5500, etc.)
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5500",
     "http://127.0.0.1:5500",
-    "http://192.168.99.122:5500",   # se abrir o front de outro dispositivo/rede local
-    "http://localhost:8000",        # opcional quando o front também roda no mesmo host/porta
-    # "https://seu-frontend.com",   # quando publicar
+    "http://localhost:5501",
+    "http://127.0.0.1:5501",
+    "http://localhost:8000",
 ]
-CORS_ALLOW_CREDENTIALS = True
-
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5500",
-    "http://192.168.99.122:5500",
+    "http://localhost:5501",
 ]
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

@@ -4,10 +4,19 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from core.serializers import EmailOrUsernameTokenObtainPairSerializer
 
+# Atalho para o modelo de usuário configurado no projeto
 User = get_user_model()
 
+
 class EmailOrUsernameTokenObtainPairSerializerTestCase(TestCase):
+    """
+    Testes do serializer customizado de login (JWT) que aceita username ou e-mail.
+    """
+
     def setUp(self):
+        """
+        Cria um usuário de teste para ser usado em todos os cenários.
+        """
         self.password = "SenhaSegura123"
         self.user = User.objects.create_user(
             username="usuario_teste",
@@ -17,88 +26,91 @@ class EmailOrUsernameTokenObtainPairSerializerTestCase(TestCase):
 
     def test_login_with_username_should_succeed(self):
         """
-        Cenário Padrão: O usuário fornece o username correto e senha.
-        O serializer deve se comportar como o padrão e retornar os tokens.
+        Cenário padrão:
+        - Usuário envia username + senha corretos.
+        - Deve receber tokens 'access' e 'refresh'.
         """
         data = {
             "username": "usuario_teste",
             "password": self.password
         }
-        
+
+        # Instancia o serializer com os dados de login
         serializer = EmailOrUsernameTokenObtainPairSerializer(data=data)
+
+        # is_valid executa a validação interna (incluindo authenticate)
         self.assertTrue(serializer.is_valid(), serializer.errors)
-        
-        # O método validate do TokenObtainPairSerializer retorna um dict com 'access' e 'refresh'
+
+        # validated_data deve conter os tokens gerados pelo SimpleJWT
         result = serializer.validated_data
         self.assertIn("access", result)
         self.assertIn("refresh", result)
 
     def test_login_with_email_should_succeed(self):
         """
-        Cenário Customizado: O usuário deixa o username vazio, mas fornece o e-mail.
-        O serializer deve buscar o username pelo e-mail e autenticar.
+        Cenário customizado:
+        - Usuário envia e-mail + senha, deixando username vazio.
+        - O serializer deve resolver o username pelo e-mail e autenticar.
         """
         data = {
-            "username": "",  # Simulando campo vazio vindo do front
+            "username": "",  # Simula envio de campo vazio pelo front
             "email": "teste@example.com",
             "password": self.password
         }
-        
+
         serializer = EmailOrUsernameTokenObtainPairSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
-        
+
         result = serializer.validated_data
         self.assertIn("access", result)
         self.assertIn("refresh", result)
 
     def test_login_with_email_case_insensitive(self):
         """
-        Verifica se o login funciona mesmo se o e-mail for enviado com letras maiúsculas
-        (visto que o código usa email__iexact).
+        Verifica se o login funciona mesmo com e-mail em caixa alta/mista,
+        já que o código usa filtro email__iexact.
         """
         data = {
-            "email": "TESTE@Example.com", # E-mail misturado
+            "email": "TESTE@Example.com",  # E-mail com maiúsculas
             "password": self.password
         }
-        
+
         serializer = EmailOrUsernameTokenObtainPairSerializer(data=data)
         self.assertTrue(serializer.is_valid())
-        
+
         result = serializer.validated_data
         self.assertIn("access", result)
 
     def test_login_should_fail_with_wrong_password(self):
         """
-        Deve levantar AuthenticationFailed se a senha estiver incorreta,
-        seja usando e-mail ou username.
+        Se a senha estiver errada, o serializer deve lançar AuthenticationFailed.
         """
         data = {
             "email": "teste@example.com",
             "password": "senha_errada"
         }
-        
+
         serializer = EmailOrUsernameTokenObtainPairSerializer(data=data)
-        
-        # O método validate() do SimpleJWT lança exceção se a auth falhar
+
+        # validate() deve disparar AuthenticationFailed em caso de falha
         with self.assertRaises(AuthenticationFailed):
-             # is_valid chama run_validation -> validate
+            # is_valid chama run_validation -> validate
             if serializer.is_valid():
-                 _ = serializer.validated_data
+                _ = serializer.validated_data
 
     def test_login_should_fail_with_non_existent_email(self):
         """
-        Se o e-mail não existe, o serializer não consegue preencher o username,
-        e a autenticação subsequente deve falhar.
+        Se o e-mail não existir, o serializer não encontra o usuário
+        e deve lançar AuthenticationFailed.
         """
         data = {
             "email": "naoexiste@example.com",
             "password": "qualquer_senha"
         }
-        
+
         serializer = EmailOrUsernameTokenObtainPairSerializer(data=data)
-        
-        # Dependendo da versão do SimpleJWT, pode falhar na validação ou na autenticação.
-        # Geralmente lança AuthenticationFailed("No active account found with the given credentials")
+
+        # Para e-mail inexistente, o fluxo também resulta em AuthenticationFailed
         with self.assertRaises(AuthenticationFailed):
             if serializer.is_valid():
-                 _ = serializer.validated_data
+                _ = serializer.validated_data

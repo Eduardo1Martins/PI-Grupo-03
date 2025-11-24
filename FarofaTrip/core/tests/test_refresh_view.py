@@ -7,7 +7,19 @@ User = get_user_model()
 
 
 class RefreshViewTests(APITestCase):
+    """
+    Testes para o endpoint de refresh de token JWT (/auth/refresh/).
+
+    Cobre:
+    - refresh bem-sucedido com token válido
+    - erro com token inválido
+    - erro quando o refresh token não é enviado.
+    """
+
     def setUp(self):
+        """
+        Cria um usuário de teste e define as URLs de login e refresh.
+        """
         self.user = User.objects.create_user(
             username="user1",
             email="user1@example.com",
