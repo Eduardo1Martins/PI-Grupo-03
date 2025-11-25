@@ -279,7 +279,7 @@
   <div class="card-section">
     <h6>Dados do Pagamento</h6>
     <div class="payment-option">
-  <input type="radio" name="pagamento" id="credito" value="credito" checked>
+  <input type="radio" name="pagamento" id="credito" value="cartao" checked>
   <label for="credito" class="d-flex align-items-center gap-2 mb-0">
     <img src="./assets/img/card1.svg" alt="PIX" class="pix-icon">
     <span>Cartão de Crédito</span>
@@ -318,12 +318,13 @@
     const formCredito = document.getElementById('formCredito');
 
     function toggleForm() {
-      const selecionado = document.querySelector('input[name="pagamento"]:checked')?.value;
-      const mostrar = selecionado === 'credito';
-      formCredito.style.display = mostrar ? 'block' : 'none';
-      formCredito.querySelectorAll('input').forEach(el => el.disabled = !mostrar);
-      formCredito.setAttribute('aria-hidden', mostrar ? 'false' : 'true');
-    }
+    const selecionado = document.querySelector('input[name="pagamento"]:checked')?.value;
+    const mostrar = !selecionado || selecionado === 'cartao'; // cartao = cartão de crédito
+    formCredito.style.display = mostrar ? 'block' : 'none';
+    formCredito.querySelectorAll('input').forEach(el => el.disabled = !mostrar);
+    formCredito.setAttribute('aria-hidden', mostrar ? 'false' : 'true');
+}
+
 
     radios.forEach(r => r.addEventListener('change', toggleForm));
     toggleForm();
@@ -399,22 +400,25 @@
     );
   }
 
-  function buildPedidoPayloadFromCart(cartState) {
-    const pagamento = document.querySelector('input[name="pagamento"]:checked')?.value || 'credito';
+ function buildPedidoPayloadFromCart(cartState) {
+  let pagamento = document.querySelector('input[name="pagamento"]:checked')?.value || 'cartao';
 
-    return {
-      forma_pagamento: pagamento,               // backend: Pedido.forma_pagamento
-      observacoes: `Pagamento via ${pagamento.toUpperCase()} - app`, // opcional
-      itens: (cartState.items || []).map(it => ({
-        // mapeia 1:1 cada linha do carrinho para um item do pedido
-        evento_id: it.eventoId,                 // precisa existir no carrinho
-        quantidade: Number(it.qty || 0),
-        // separa ingresso x excursão usando o "kind" que você já usa no carrinho
-        preco_ingresso: it.kind === 'ingresso' ? Number(it.unitPrice || 0) : 0,
-        preco_excursao: it.kind === 'excursao' ? Number(it.unitPrice || 0) : 0
-      }))
-    };
+  // normaliza qualquer coisa antiga
+  if (pagamento === 'credito') {
+    pagamento = 'cartao';
   }
+  return {
+    forma_pagamento: pagamento, // agora bate com ("cartao", "pix", "boleto")
+    observacoes: `Pagamento via ${pagamento.toUpperCase()} - app`,
+    itens: (cartState.items || []).map(it => ({
+      evento_id: it.eventoId,
+      quantidade: Number(it.qty || 0),
+      preco_ingresso: it.kind === 'ingresso' ? Number(it.unitPrice || 0) : 0,
+      preco_excursao: it.kind === 'excursao' ? Number(it.unitPrice || 0) : 0
+    }))
+  };
+}
+
 
   function buildOrderSnapshot(pedido, cartState) {
     // Se o backend devolver os itens, usamos; senão, usamos o snapshot do carrinho

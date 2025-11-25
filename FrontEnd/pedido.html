@@ -102,21 +102,21 @@
       color: #000;
     }
 
-    /* ============================
-   RESPONSIVIDADE PARA TELAS MAIORES
-   (tablets, notebooks e PCs)
+/* ============================
+   RESPONSIVIDADE GLOBAL
+   (aplicar em todas as páginas)
    ============================ */
 
 /* Tablets em diante (>= 768px) */
 @media (min-width: 768px) {
 
-  /* Evita body "travado" em 90vh */
+  /* Evita body travado em 90vh */
   body {
     height: auto;
     min-height: 100vh;
   }
 
-  /* Centraliza e limita largura dos conteúdos principais */
+  /* Centraliza e limita largura dos principais blocos de conteúdo */
   .titulo,
   .title,
   .divider,
@@ -138,13 +138,13 @@
     margin-top: 1.5rem;
   }
 
-  /* Blocos "card-section" ficam parecidos em todas as telas */
+  /* Blocos com “card-section” padronizados */
   .card-section {
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
   }
 
-  /* Área de informações do evento (ingresso) fica mais organizada */
+  /* Informações de evento ficam mais organizadas em telas médias+ */
   .event-info {
     gap: 1.5rem;
   }
@@ -155,7 +155,7 @@
     height: auto;
   }
 
-  /* Botões de ação principais: largura agradável no desktop */
+  /* Botões principais com largura confortável em desktop */
   .btn-cart,
   .btn-confirmar,
   .btn-finalizar,
@@ -164,13 +164,7 @@
     max-width: 360px;
   }
 
-  /* Texto da página "Sobre nós" um pouco mais confortável de ler */
-  .sobre-nos .texto p {
-    font-size: 1.1rem;
-    line-height: 1.9rem;
-  }
-
-  /* Tela de embarque: conteúdo mais compacto em desktop */
+  /* Telas tipo “conteúdo único” (ex: embarque / resumo) mais compactas */
   .content {
     max-width: 640px;
     margin-left: auto;
@@ -178,7 +172,7 @@
   }
 }
 
-/* Notebooks/monitores grandes (>= 1200px) */
+/* Monitores grandes (>= 1200px) */
 @media (min-width: 1200px) {
 
   .titulo,
@@ -194,14 +188,20 @@
     max-width: 1040px;
   }
 
-  /* Banner da home fica com largura controlada em telas enormes,
-     mas ainda ocupando quase toda a linha */
+  /* Se tiver banner na home, ele fica com largura controlada,
+     sem ficar “perdido” em telas muito largas */
   .banner-container {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
   }
 }
+
+  .banner-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
   </style>
 </head>
@@ -285,72 +285,101 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
-  <script>
-  const CART_KEY = 'cart:v1';           // não usado aqui, mas mantido se precisar
-  const LAST_ORDER_KEY = 'order:last';  // chave onde o pedido foi salvo
-  const money = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+<script>
+  const LAST_ORDER_KEY = 'order:last';
+  const money = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
 
-  // Abstração mínima para o carrinho (aqui só limpeza, se necessário)
-  const CartStore = {
-    load() {
-      try { return JSON.parse(localStorage.getItem(CART_KEY)) || { items: [] }; }
-      catch { return { items: [] }; }
-    },
-    clear() { localStorage.removeItem(CART_KEY); }
-  };
-
-  /**
-   * Recupera o último pedido salvo em LAST_ORDER_KEY.
-   */
   function loadLastOrder() {
     try {
-      return JSON.parse(localStorage.getItem(LAST_ORDER_KEY)) || null;
-    } catch {
+      const raw = localStorage.getItem(LAST_ORDER_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      console.error('Erro ao ler order:last do localStorage:', e);
       return null;
     }
   }
 
-  /**
-   * Renderiza o resumo do pedido: itens, total, dados do cliente, etc.
-   */
   function renderOrder() {
-    const order = loadLastOrder();
-    if (!order) {
-      document.getElementById('order-empty')?.classList.remove('d-none');
-      document.getElementById('order-content')?.classList.add('d-none');
+    const orderIdEl     = document.getElementById('order-id');
+    const orderTotalEl  = document.getElementById('order-total');
+    const itemsContainer = document.getElementById('order-items');
+
+    if (!orderIdEl || !orderTotalEl || !itemsContainer) {
+      console.warn('Elementos #order-id, #order-total ou #order-items não encontrados.');
       return;
     }
 
-    const content = document.getElementById('order-content');
-    content.classList.remove('d-none');
-    document.getElementById('order-empty')?.classList.add('d-none');
+    const order = loadLastOrder();
+    console.log('Pedido carregado de order:last:', order);
 
-    // Exemplo: adapta aos campos da resposta da sua API (/pedidos/)
-    document.getElementById('order-id').textContent = order.id ?? '';
-    document.getElementById('order-nome').textContent = order.nome ?? '';
-    document.getElementById('order-email').textContent = order.email ?? '';
-    document.getElementById('order-documento').textContent = order.documento ?? '';
+    if (!order) {
+      orderIdEl.textContent = '----';
+      orderTotalEl.textContent = money.format(0);
+      itemsContainer.innerHTML = '';
+      return;
+    }
 
-    const itemsContainer = document.getElementById('order-items');
+    // ID do pedido
+    orderIdEl.textContent = order.id ?? order.backendId ?? '----';
+
     itemsContainer.innerHTML = '';
 
+    // pode vir "itens" (backend) ou "items" (snapshot)
     const itens = order.itens || order.items || [];
     let total = 0;
 
     for (const it of itens) {
-      const li = document.createElement('li');
-      const nome = it.nome_evento || it.evento_nome || it.nome || 'Ingresso';
-      const qtd  = it.quantidade || it.qty || 1;
-      const preco = parseFloat(it.preco_unitario || it.preco || 0);
+      // nome pode vir como evento_nome (backend) ou name (snapshot)
+      const nome = it.evento_nome || it.nome || it.name || 'Ingresso';
 
-      const subtotal = preco * qtd;
+      // quantidade pode ser "quantidade" (backend) ou "qty" (snapshot)
+      const qtd = Number(
+        it.quantidade ?? it.qty ?? 1
+      );
+
+      let subtotal = 0;
+
+      if (it.subtotal != null) {
+        // formato backend já calculado
+        subtotal = Number(it.subtotal);
+      } else {
+        // formato snapshot ou fallback
+        const unitFromSnapshot = it.unitPrice != null ? Number(it.unitPrice) : null;
+        const pIng = it.preco_ingresso != null ? Number(it.preco_ingresso) : 0;
+        const pExc = it.preco_excursao != null ? Number(it.preco_excursao) : 0;
+
+        const unit = unitFromSnapshot != null
+          ? unitFromSnapshot
+          : (pIng + pExc);
+
+        subtotal = unit * qtd;
+      }
+
       total += subtotal;
 
-      li.textContent = `${nome} x${qtd} - ${money.format(subtotal)}`;
-      itemsContainer.appendChild(li);
+      const row = document.createElement('div');
+      row.className = 'item-line';
+      row.innerHTML = `
+        <span>${nome} x${qtd}</span>
+        <span class="price">${money.format(subtotal)}</span>
+      `;
+      itemsContainer.appendChild(row);
     }
 
-    document.getElementById('order-total').textContent = money.format(total);
+    // Se por algum motivo o loop não somou nada, usa o total salvo
+    if (!total) {
+      if (order.valor_total != null) {
+        total = Number(order.valor_total);
+      } else if (order.total != null) {
+        total = Number(order.total);
+      }
+    }
+
+    orderTotalEl.textContent = money.format(total);
   }
 
   document.addEventListener('DOMContentLoaded', renderOrder);

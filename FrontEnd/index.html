@@ -105,7 +105,7 @@
 /* Tablets em diante (>= 768px) */
 @media (min-width: 768px) {
 
-  /* Evita body "travado" em 90vh */
+  /* Evita body travado */
   body {
     height: auto;
     min-height: 100vh;
@@ -139,7 +139,7 @@
     margin-bottom: 1.5rem;
   }
 
-  /* Área de informações do evento (ingresso) fica mais organizada */
+  /* Área de informações do evento (ingresso) mais organizada */
   .event-info {
     gap: 1.5rem;
   }
@@ -150,7 +150,7 @@
     height: auto;
   }
 
-  /* Botões de ação principais: largura agradável no desktop */
+  /* Botões principais com largura agradável */
   .btn-cart,
   .btn-confirmar,
   .btn-finalizar,
@@ -159,13 +159,13 @@
     max-width: 360px;
   }
 
-  /* Texto da página "Sobre nós" um pouco mais confortável de ler */
+  /* Texto da página "Sobre nós" mais confortável */
   .sobre-nos .texto p {
     font-size: 1.1rem;
     line-height: 1.9rem;
   }
 
-  /* Tela de embarque: conteúdo mais compacto em desktop */
+  /* Tela de embarque: conteúdo mais compacto */
   .content {
     max-width: 640px;
     margin-left: auto;
@@ -173,7 +173,29 @@
   }
 }
 
-/* Notebooks/monitores grandes (>= 1200px) */
+/* Notebooks / telas médias (>= 992px) */
+@media (min-width: 992px) {
+
+  /* Lista de eventos em grade (2 colunas) */
+  #events-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* Cards sem margin extra (usamos o gap) */
+  .card-evento {
+    margin: 0;
+  }
+
+  /* Imagem menor em desktop (antes era 630px) */
+  .card-evento .card-img-top {
+    height: 320px;
+    object-fit: cover;
+  }
+}
+
+/* Monitores grandes (>= 1200px) */
 @media (min-width: 1200px) {
 
   .titulo,
@@ -189,38 +211,19 @@
     max-width: 1040px;
   }
 
-  /* Banner da home fica com largura controlada em telas enormes,
-     mas ainda ocupando quase toda a linha */
-  .banner-container {
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  /* Cards menores em telas de PC */
-@media (min-width: 992px) {
-
-  /* container dos cards */
+  /* Em telas bem grandes, 3 colunas de eventos */
   #events-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;   /* centraliza os cards */
-    gap: 1.5rem;               /* espaço entre eles */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  /* cada card de evento */
-  .card-evento {
-    width: 507px;              /* ajusta o tamanho do card */
-    margin: 0;                 /* usamos o gap do flex */
-  }
-
-  /* imagem do card com altura fixa e corte */
+  /* Deixa o card um pouco mais "alto" mas ainda razoável */
   .card-evento .card-img-top {
-    height: 630px;
+    height: 380px;
   }
-}
-}
 
+  /* Banner continua ocupando toda a largura da página (sem max-width)
+     então não colocamos restrição aqui para não criar bordas vazias */
+}
   </style>
 
 </head>
@@ -264,7 +267,7 @@
       <li><a href="index.html" class="text-white text-decoration-none d-block py-2">Eventos</a></li>
       <li><a href="sobre.html" class="text-white text-decoration-none d-block py-2">Sobre Nós</a></li>
       <li><a href="#" class="text-white text-decoration-none d-block py-2">Conta</a></li>
-      <li><a href="#" class="text-white text-decoration-none d-block py-2">Sair</a></li>
+      <li><a id="menu-logout" href="#" class="text-white text-decoration-none d-block py-2">Sair</a></li>
     </ul>
     <div class="d-flex justify-content-start gap-4 mt-3">
   <a href="#" class="text-white fs-1"><i class="bi bi-instagram"></i></a>

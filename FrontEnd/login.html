@@ -104,21 +104,21 @@
   /* Borda vermelha em campos inválidos na validação manual */
   .is-invalid { border: 2px solid #ff4d4f !important; }
 
-  /* ============================
-   RESPONSIVIDADE PARA TELAS MAIORES
-   (tablets, notebooks e PCs)
+/* ============================
+   RESPONSIVIDADE GLOBAL
+   (aplicar em todas as páginas)
    ============================ */
 
 /* Tablets em diante (>= 768px) */
 @media (min-width: 768px) {
 
-  /* Evita body "travado" em 90vh */
+  /* Evita body travado em 90vh */
   body {
     height: auto;
     min-height: 100vh;
   }
 
-  /* Centraliza e limita largura dos conteúdos principais */
+  /* Centraliza e limita largura dos principais blocos de conteúdo */
   .titulo,
   .title,
   .divider,
@@ -140,13 +140,13 @@
     margin-top: 1.5rem;
   }
 
-  /* Blocos "card-section" ficam parecidos em todas as telas */
+  /* Blocos com “card-section” padronizados */
   .card-section {
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
   }
 
-  /* Área de informações do evento (ingresso) fica mais organizada */
+  /* Informações de evento ficam mais organizadas em telas médias+ */
   .event-info {
     gap: 1.5rem;
   }
@@ -157,7 +157,7 @@
     height: auto;
   }
 
-  /* Botões de ação principais: largura agradável no desktop */
+  /* Botões principais com largura confortável em desktop */
   .btn-cart,
   .btn-confirmar,
   .btn-finalizar,
@@ -166,13 +166,7 @@
     max-width: 360px;
   }
 
-  /* Texto da página "Sobre nós" um pouco mais confortável de ler */
-  .sobre-nos .texto p {
-    font-size: 1.1rem;
-    line-height: 1.9rem;
-  }
-
-  /* Tela de embarque: conteúdo mais compacto em desktop */
+  /* Telas tipo “conteúdo único” (ex: embarque / resumo) mais compactas */
   .content {
     max-width: 640px;
     margin-left: auto;
@@ -180,7 +174,7 @@
   }
 }
 
-/* Notebooks/monitores grandes (>= 1200px) */
+/* Monitores grandes (>= 1200px) */
 @media (min-width: 1200px) {
 
   .titulo,
@@ -196,14 +190,15 @@
     max-width: 1040px;
   }
 
-  /* Banner da home fica com largura controlada em telas enormes,
-     mas ainda ocupando quase toda a linha */
+  /* Se tiver banner na home, ele fica com largura controlada,
+     sem ficar “perdido” em telas muito largas */
   .banner-container {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
   }
 }
+
 
   </style>
 </head>
@@ -239,7 +234,7 @@
     <!-- Botão de login com Google (atualmente desabilitado) -->
     <div class="div-google">
       <button class="btn google-btn w-100 mb-4" type="button" disabled title="Em breve">
-        <img src="./assets/img/Google-logo.png" alt="Google">
+        <img src="./assets/img/google.png" alt="Google">
         <span>Continuar com o Google</span>
       </button>
     </div>
