@@ -1,281 +1,287 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Próximos Eventos</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+
 
   <style>
     body {
-  font-family: 'DM Sans', sans-serif;
-  margin: 0;
-}
+      font-family: 'DM Sans', sans-serif;
+      margin: 0;
+    }
 
-.navbar-brand img {
+    .navbar-brand img {
       height: 30px;
-}
+    }
 
-.navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-}
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
 
-.banner-container img {
-  object-fit: cover;
-}
+    .banner-container img {
+      object-fit: cover;
+    }
 
-.banner-text {
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  width: 100%;
-  color: #fff;
-}
+    .banner-text {
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      width: 100%;
+      color: #fff;
+    }
 
-.banner-container{
-  position: relative;      
-  width: 100%;
-  aspect-ratio: 577 / 400;  
-  overflow: hidden;      
-}
+    .banner-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 577 / 400;
+      overflow: hidden;
+    }
 
-.banner-container > img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover; 
-  display: block;
-  object-position: center;
-}
+    .banner-container>img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      object-position: center;
+    }
 
-.card {
-  margin: 0.75rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
+    .card {
+      margin: 0.75rem;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
 
-.event-card img {
-  object-fit: cover;
-}
+    .event-card img {
+      object-fit: cover;
+    }
 
-.form-control {
-  padding: 0.5rem;  
-  padding-left: 1rem;
-  background-color: #fff;
-  border: none;
-  color: #000;
-}
+    .form-control {
+      padding: 0.5rem;
+      padding-left: 1rem;
+      background-color: #fff;
+      border: none;
+      color: #000;
+    }
 
-.form-control:focus {
-  box-shadow: none;
-  border: 1px solid #00ff84;
-}
+    .form-control:focus {
+      box-shadow: none;
+      border: 1px solid #00ff84;
+    }
 
-.title {
-    margin: 0.75rem;
-}
+    .title {
+      margin: 0.75rem;
+    }
 
-.divider {
-  height: 1px;
-  background-color: #e3e3e3;
-  margin: 0.75rem;  
-  margin-top: 0.25rem;
-}
+    .divider {
+      height: 1px;
+      background-color: #e3e3e3;
+      margin: 0.75rem;
+      margin-top: 0.25rem;
+    }
 
-.menu-divider {
-  height: 1px;
-  background-color: #e3e3e3;
-  margin: 0.75rem;
-  margin-top: 0;
-}
+    .menu-divider {
+      height: 1px;
+      background-color: #e3e3e3;
+      margin: 0.75rem;
+      margin-top: 0;
+    }
 
-.input-group {
-  position: relative;
-}
+    .input-group {
+      position: relative;
+    }
 
-/* ============================
+    /* ============================
    RESPONSIVIDADE PARA TELAS MAIORES
    (tablets, notebooks e PCs)
    ============================ */
 
-/* Tablets em diante (>= 768px) */
-@media (min-width: 768px) {
+    /* Tablets em diante (>= 768px) */
+    @media (min-width: 768px) {
 
-  /* Evita body travado */
-  body {
-    height: auto;
-    min-height: 100vh;
-  }
+      /* Evita body travado */
+      body {
+        height: auto;
+        min-height: 100vh;
+      }
 
-  /* Centraliza e limita largura dos conteúdos principais */
-  .titulo,
-  .title,
-  .divider,
-  .sobre-nos,
-  .texto,
-  .card-section,
-  .event-info,
-  form,
-  .total-input,
-  .mensagem-final {
-    max-width: 960px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+      /* Centraliza e limita largura dos conteúdos principais */
+      .titulo,
+      .title,
+      .divider,
+      .sobre-nos,
+      .texto,
+      .card-section,
+      .event-info,
+      form,
+      .total-input,
+      .mensagem-final {
+        max-width: 960px;
+        margin-left: auto;
+        margin-right: auto;
+      }
 
-  /* Dá um respiro maior no topo da página */
-  .titulo,
-  .title {
-    margin-top: 1.5rem;
-  }
+      /* Dá um respiro maior no topo da página */
+      .titulo,
+      .title {
+        margin-top: 1.5rem;
+      }
 
-  /* Blocos "card-section" ficam parecidos em todas as telas */
-  .card-section {
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
+      /* Blocos "card-section" ficam parecidos em todas as telas */
+      .card-section {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
 
-  /* Área de informações do evento (ingresso) mais organizada */
-  .event-info {
-    gap: 1.5rem;
-  }
+      /* Área de informações do evento (ingresso) mais organizada */
+      .event-info {
+        gap: 1.5rem;
+      }
 
-  .event-info img {
-    max-width: 160px;
-    width: 100%;
-    height: auto;
-  }
+      .event-info img {
+        max-width: 160px;
+        width: 100%;
+        height: auto;
+      }
 
-  /* Botões principais com largura agradável */
-  .btn-cart,
-  .btn-confirmar,
-  .btn-finalizar,
-  .btn-voltar {
-    width: 100%;
-    max-width: 360px;
-  }
+      /* Botões principais com largura agradável */
+      .btn-cart,
+      .btn-confirmar,
+      .btn-finalizar,
+      .btn-voltar {
+        width: 100%;
+        max-width: 360px;
+      }
 
-  /* Texto da página "Sobre nós" mais confortável */
-  .sobre-nos .texto p {
-    font-size: 1.1rem;
-    line-height: 1.9rem;
-  }
+      /* Texto da página "Sobre nós" mais confortável */
+      .sobre-nos .texto p {
+        font-size: 1.1rem;
+        line-height: 1.9rem;
+      }
 
-  /* Tela de embarque: conteúdo mais compacto */
-  .content {
-    max-width: 640px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
+      /* Tela de embarque: conteúdo mais compacto */
+      .content {
+        max-width: 640px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
 
-/* Notebooks / telas médias (>= 992px) */
-@media (min-width: 992px) {
+    /* Notebooks / telas médias (>= 992px) */
+    @media (min-width: 992px) {
 
-  /* Lista de eventos em grade (2 colunas) */
-  #events-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
-  }
+      /* Lista de eventos em grade (2 colunas) */
+      #events-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem;
+      }
 
-  /* Cards sem margin extra (usamos o gap) */
-  .card-evento {
-    margin: 0;
-  }
+      /* Cards sem margin extra (usamos o gap) */
+      .card-evento {
+        margin: 0;
+      }
 
-  /* Imagem menor em desktop (antes era 630px) */
-  .card-evento .card-img-top {
-    height: 320px;
-    object-fit: cover;
-  }
-}
+      /* Imagem menor em desktop (antes era 630px) */
+      .card-evento .card-img-top {
+        height: 320px;
+        object-fit: cover;
+      }
+    }
 
-/* Monitores grandes (>= 1200px) */
-@media (min-width: 1200px) {
+    /* Monitores grandes (>= 1200px) */
+    @media (min-width: 1200px) {
 
-  .titulo,
-  .title,
-  .divider,
-  .sobre-nos,
-  .texto,
-  .card-section,
-  .event-info,
-  form,
-  .total-input,
-  .mensagem-final {
-    max-width: 1040px;
-  }
+      .titulo,
+      .title,
+      .divider,
+      .sobre-nos,
+      .texto,
+      .card-section,
+      .event-info,
+      form,
+      .total-input,
+      .mensagem-final {
+        max-width: 1040px;
+      }
 
-  /* Em telas bem grandes, 3 colunas de eventos */
-  #events-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+      /* Em telas bem grandes, 3 colunas de eventos */
+      #events-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
 
-  /* Deixa o card um pouco mais "alto" mas ainda razoável */
-  .card-evento .card-img-top {
-    height: 380px;
-  }
+      /* Deixa o card um pouco mais "alto" mas ainda razoável */
+      .card-evento .card-img-top {
+        height: 380px;
+      }
 
-  /* Banner continua ocupando toda a largura da página (sem max-width)
+      /* Banner continua ocupando toda a largura da página (sem max-width)
      então não colocamos restrição aqui para não criar bordas vazias */
-}
+    }
   </style>
 
 </head>
+
 <body class="bg-black text-white">
 
-<nav class="navbar navbar-dark" style="background-color: #24D301;">
-  <div class="container-fluid d-flex justify-content-between align-items-center ms-1 me-1">
+  <nav class="navbar navbar-dark" style="background-color: #24D301;">
+    <div class="container-fluid d-flex justify-content-between align-items-center ms-1 me-1">
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral" aria-controls="menuLateral">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral"
+        aria-controls="menuLateral">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-    <a class="navbar-brand fw-bold text-dark" href="#">
-      <img src="./assets/img/logo.png" alt="Logo" height="30">
-    </a>
+      <a class="navbar-brand fw-bold text-dark" href="#">
+        <img src="./assets/img/logo.png" alt="Logo" height="30">
+      </a>
 
-    <div class="d-flex align-items-center gap-3">
-  <a href="carrinho.html" class="text-dark position-relative" aria-label="Abrir carrinho">
-    <i class="bi bi-cart3 fs-2"></i>
-    <span id="cart-count-badge"
-          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-          style="display:none; font-size:.7rem; min-width:1.1rem; height:1.1rem; padding:0; line-height:1.1rem;">
-      0
-    </span>
-  </a>
-  <a href="conta.html" class="text-dark" aria-label="Minha conta">
-    <i class="bi bi-person-circle fs-2"></i>
-  </a>
-</div>
-</nav>
+      <div class="d-flex align-items-center gap-3">
+        <a href="carrinho.html" class="text-dark position-relative" aria-label="Abrir carrinho">
+          <i class="bi bi-cart3 fs-2"></i>
+          <span id="cart-count-badge"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+            style="display:none; font-size:.7rem; min-width:1.1rem; height:1.1rem; padding:0; line-height:1.1rem;">
+            0
+          </span>
+        </a>
+        <a href="conta.html" class="text-dark" aria-label="Minha conta">
+          <i class="bi bi-person-circle fs-2"></i>
+        </a>
+      </div>
+  </nav>
 
 
-<div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="menuLateral" aria-labelledby="menuLateralLabel">
-  <div class="offcanvas-header">
-    <h2 class="offcanvas-title" id="menuLateralLabel">Menu</h2>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+  <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="menuLateral" aria-labelledby="menuLateralLabel">
+    <div class="offcanvas-header">
+      <h2 class="offcanvas-title" id="menuLateralLabel">Menu</h2>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="offcanvas-body">
+      <ul class="list-unstyled">
+        <li><a href="index.html" class="text-white text-decoration-none d-block py-2">Eventos</a></li>
+        <li><a href="sobre.html" class="text-white text-decoration-none d-block py-2">Sobre Nós</a></li>
+        <li><a href="#" class="text-white text-decoration-none d-block py-2">Conta</a></li>
+        <li><a id="menu-logout" href="#" class="text-white text-decoration-none d-block py-2">Sair</a></li>
+      </ul>
+      <div class="d-flex justify-content-start gap-4 mt-3">
+        <a href="#" class="text-white fs-1"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="text-white fs-1"><i class="bi bi-tiktok"></i></a>
+        <a href="#" class="text-white fs-1"><i class="bi bi-whatsapp"></i></a>
+      </div>
+    </div>
   </div>
-  <div class="menu-divider"></div>
-  <div class="offcanvas-body">
-    <ul class="list-unstyled">
-      <li><a href="index.html" class="text-white text-decoration-none d-block py-2">Eventos</a></li>
-      <li><a href="sobre.html" class="text-white text-decoration-none d-block py-2">Sobre Nós</a></li>
-      <li><a href="#" class="text-white text-decoration-none d-block py-2">Conta</a></li>
-      <li><a id="menu-logout" href="#" class="text-white text-decoration-none d-block py-2">Sair</a></li>
-    </ul>
-    <div class="d-flex justify-content-start gap-4 mt-3">
-  <a href="#" class="text-white fs-1"><i class="bi bi-instagram"></i></a>
-  <a href="#" class="text-white fs-1"><i class="bi bi-tiktok"></i></a>
-  <a href="#" class="text-white fs-1"><i class="bi bi-whatsapp"></i></a>
-</div>
-  </div>
-</div>
 
   <div class="banner-container position-relative mb-4">
     <img src="./assets/img/banner-Principal.png" alt="Evento principal" class="card-img-top">
@@ -292,310 +298,347 @@
         <i class="bi bi-search text-muted"></i>
       </span>
     </div>
-    
+
 
     <h3 class="title fw-bold mb-0">Próximos Eventos</h3>
 
     <div class="divider mb-4"></div>
 
-    
-<div id="events-list"></div>
+
+    <div id="events-list"></div>
 
 
 
-<script>
-(function () {
-  // URL base da API (ajuste para produção se necessário)
-  const API_BASE = 'http://localhost:8000/api';
+    <script>
+      (function () {
+        // URL base da API (ajuste para produção se necessário)
+        const API_BASE = 'http://localhost:8000/api';
 
-  // Chaves possíveis onde o JWT pode estar salvo no localStorage
-  const TOKEN_KEYS = ['token', 'token2'];
+        // Chaves possíveis onde o JWT pode estar salvo no localStorage
+        const TOKEN_KEYS = ['access', 'token', 'token2'];
 
-  /**
-   * Busca o primeiro token JWT válido salvo no localStorage.
-   * Retorna a string do token (sem aspas) ou null.
-   */
-  function getToken() {
-    for (const k of TOKEN_KEYS) {
-      const v = localStorage.getItem(k);
-      if (v) return String(v).replace(/^"|"$/g, ''); // remove aspas extras
-    }
-    return null;
-  }
+        /**
+         * Busca o primeiro token JWT válido salvo no localStorage.
+         * Retorna a string do token (sem aspas) ou null.
+         */
+        function getToken() {
+          for (const k of TOKEN_KEYS) {
+            const v = localStorage.getItem(k);
+            if (v) return String(v).replace(/^"|"$/g, ''); // remove aspas extras
+          }
+          return null;
+        }
 
-  // Cabeçalhos base usados nas requisições à API
-  const baseHeaders = { Accept: 'application/json' };
-  const jwt = getToken();
-  if (jwt) baseHeaders.Authorization = `Bearer ${jwt}`;
+        // Cabeçalhos base usados nas requisições à API
+        const baseHeaders = { Accept: 'application/json' };
+        const jwt = getToken();
+        if (jwt) baseHeaders.Authorization = `Bearer ${jwt}`;
 
-  // Elementos principais da página
-  const listEl   = document.getElementById('events-list');          // container dos cards
-  const searchEl = document.querySelector('.input-group input');    // input de busca
-  const bannerEl = document.querySelector('.banner-container');     // banner rotativo
+        // Elementos principais da página
+        const listEl = document.getElementById('events-list');          // container dos cards
+        const searchEl = document.querySelector('.input-group input');    // input de busca
+        const bannerEl = document.querySelector('.banner-container');     // banner rotativo
 
-  // Array local com todos os eventos carregados da API
-  let allEvents = [];
+        // Array local com todos os eventos carregados da API
+        let allEvents = [];
 
-  /**
-   * Busca todos os eventos na API.
-   * Retorna um objeto { eventos, fromPast } para possível expansão futura.
-   */
-  async function fetchEventos() {
-    const urlAll = `${API_BASE}/eventos/?ordering=-data&scope=all`;
-    const listAll = await getList(urlAll);
-    return { eventos: listAll, fromPast: false };
-  }
+        /**
+         * Busca todos os eventos na API.
+         * Retorna um objeto { eventos, fromPast } para possível expansão futura.
+         */
+        async function fetchEventos() {
+          const urlAll = `${API_BASE}/eventos/?ordering=-data&scope=all`;
+          const listAll = await getList(urlAll);
+          return { eventos: listAll, fromPast: false };
+        }
 
-  /**
-   * Função auxiliar genérica para buscar uma lista na API.
-   * Aceita API que retorna array direto ou paginado em { results: [] }.
-   */
-  async function getList(url) {
-    const r = await fetch(url, { headers: baseHeaders });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const j = await r.json();
-    return Array.isArray(j) ? j : (j.results || []);
-  }
+        /**
+         * Função auxiliar genérica para buscar uma lista na API.
+         * Aceita API que retorna array direto ou paginado em { results: [] }.
+         */
+        async function getList(url) {
+          const r = await fetch(url, { headers: baseHeaders });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          const j = await r.json();
+          return Array.isArray(j) ? j : (j.results || []);
+        }
 
-  // Carrega eventos ao iniciar a página
-  fetchEventos()
-    .then(({ eventos }) => {
-      allEvents = eventos;
-      renderList(allEvents);   // renderiza cards principais
-      buildBanner(allEvents);  // monta banner rotativo
-    })
-    .catch((err) => {
-      console.error('Erro ao carregar eventos:', err);
-      renderEmpty('Não foi possível carregar os eventos.');
-    });
+        // Carrega eventos ao iniciar a página
+        fetchEventos()
+          .then(({ eventos }) => {
+            allEvents = eventos;
+            renderList(allEvents);   // renderiza cards principais
+            buildBanner(allEvents);  // monta banner rotativo
+          })
+          .catch((err) => {
+            console.error('Erro ao carregar eventos:', err);
+            renderEmpty('Não foi possível carregar os eventos.');
+          });
 
-  /**
-   * Renderiza a lista de eventos na tela.
-   * Se o array estiver vazio, mostra mensagem amigável.
-   */
-  function renderList(events) {
-    listEl.innerHTML = '';
-    if (!events.length) {
-      renderEmpty('Nenhum evento encontrado.');
-      return;
-    }
-    for (const ev of events) listEl.appendChild(makeCard(ev));
-  }
+        /**
+         * Renderiza a lista de eventos na tela.
+         * Se o array estiver vazio, mostra mensagem amigável.
+         */
+        function renderList(events) {
+          listEl.innerHTML = '';
+          if (!events.length) {
+            renderEmpty('Nenhum evento encontrado.');
+            return;
+          }
+          for (const ev of events) listEl.appendChild(makeCard(ev));
+        }
 
-  /**
-   * Renderiza apenas um texto centralizado em caso de lista vazia/erro.
-   */
-  function renderEmpty(msg) {
-    listEl.innerHTML = `<p class="text-center text-muted">${msg}</p>`;
-  }
+        /**
+         * Renderiza apenas um texto centralizado em caso de lista vazia/erro.
+         */
+        function renderEmpty(msg) {
+          listEl.innerHTML = `<p class="text-center text-muted">${msg}</p>`;
+        }
 
-  /**
-   * Cria dinamicamente um card de evento usando DOM API.
-   * O card é clicável e redireciona para ingresso.html com o id do evento.
-   */
-  function makeCard(ev) {
-    const { id, nome, cidade, local, data, imagem, preco } = ev;
+        /**
+         * Cria dinamicamente um card de evento usando DOM API.
+         * O card é clicável e redireciona para ingresso.html com o id do evento.
+         */
+        function makeCard(ev) {
+          const { id, nome, cidade, local, data, imagem, preco } = ev;
 
-    const card = document.createElement('div');
-    card.className = 'card mb-4 card-evento';
-    card.style.cursor = 'pointer';
-    card.dataset.evento = id;
+          const card = document.createElement('div');
+          card.className = 'card mb-4 card-evento';
+          card.style.cursor = 'pointer';
+          card.dataset.evento = id;
 
-    const img = document.createElement('img');
-    img.className = 'card-img-top';
-    img.alt = nome || 'Evento';
-    img.src = imagem || './assets/img/placeholder.png';
+          const img = document.createElement('img');
+          img.className = 'card-img-top';
+          img.alt = nome || 'Evento';
+          img.src = imagem || './assets/img/placeholder.png';
 
-    const body = document.createElement('div');
-    body.className = 'card-body d-flex justify-content-between';
+          const body = document.createElement('div');
+          body.className = 'card-body d-flex justify-content-between';
 
-    const left = document.createElement('div');
-    const h5   = document.createElement('h5');
-    h5.className = 'card-text fw-bold';
-    h5.textContent = nome || 'Evento';
+          const left = document.createElement('div');
+          const h5 = document.createElement('h5');
+          h5.className = 'card-text fw-bold';
+          h5.textContent = nome || 'Evento';
 
-    const pLoc = document.createElement('p');
-    pLoc.className = 'card-text';
-    // aqui só cidade (local completo fica na tela de detalhes)
-    pLoc.textContent = [cidade].filter(Boolean).join(' - ');
+          const pLoc = document.createElement('p');
+          pLoc.className = 'card-text';
+          // aqui só cidade (local completo fica na tela de detalhes)
+          pLoc.textContent = [cidade].filter(Boolean).join(' - ');
 
-    left.append(h5, pLoc);
+          left.append(h5, pLoc);
 
-    const right = document.createElement('div');
-    const pDate = document.createElement('p');
-    pDate.className = 'fw-semibold mb-1';
-    pDate.textContent = formatDateBR(data); // data formatada dd/mm
+          const right = document.createElement('div');
+          const pDate = document.createElement('p');
+          pDate.className = 'fw-semibold mb-1';
+          pDate.textContent = formatDateBR(data); // data formatada dd/mm
 
-    const pPrice = document.createElement('small');
-    pPrice.className = 'text-muted';
-    if (preco !== null && preco !== undefined && preco !== '') {
-      pPrice.textContent = Number(preco).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      });
-    }
+          const pPrice = document.createElement('small');
+          pPrice.className = 'text-muted';
+          if (preco !== null && preco !== undefined && preco !== '') {
+            pPrice.textContent = Number(preco).toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            });
+          }
 
-    right.append(pDate);
-    // se quiser exibir o preço aqui, pode fazer: right.append(pDate, pPrice);
+          right.append(pDate);
+          // se quiser exibir o preço aqui, pode fazer: right.append(pDate, pPrice);
 
-    body.append(left, right);
-    card.append(img, body);
+          body.append(left, right);
+          card.append(img, body);
 
-    // Ao clicar no card, vai para a página de ingresso com o id na querystring
-    card.addEventListener('click', () => {
-      window.location.href = `ingresso.html?evento=${encodeURIComponent(id)}`;
-    });
+          // Ao clicar no card, vai para a página de ingresso com o id na querystring
+          card.addEventListener('click', () => {
+            window.location.href = `ingresso.html?evento=${encodeURIComponent(id)}`;
+          });
 
-    return card;
-  }
+          return card;
+        }
 
-  /**
-   * Formata string de data ISO (yyyy-mm-dd) para formato BR (dd/mm).
-   */
-  function formatDateBR(iso) {
-    if (!iso) return '';
-    const [y, m, d] = String(iso).split('-').map(Number);
-    if (!y || !m || !d) return '';
-    const date = new Date(y, m - 1, d);
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit'
-    }).format(date);
-  }
+        /**
+         * Formata string de data ISO (yyyy-mm-dd) para formato BR (dd/mm).
+         */
+        function formatDateBR(iso) {
+          if (!iso) return '';
+          const [y, m, d] = String(iso).split('-').map(Number);
+          if (!y || !m || !d) return '';
+          const date = new Date(y, m - 1, d);
+          return new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: '2-digit'
+          }).format(date);
+        }
 
-  /**
-   * Monta o banner rotativo no topo da página, usando eventos que possuem imagem.
-   * Faz um mini "slider" com auto-play, setas e navegação por teclado.
-   */
-  function buildBanner(events) {
-    if (!bannerEl) return;
+        /**
+         * Monta o banner rotativo no topo da página, usando eventos que possuem imagem.
+         * Faz um mini "slider" com auto-play, setas e navegação por teclado.
+         */
+        function buildBanner(events) {
+          if (!bannerEl) return;
 
-    const imgEl      = bannerEl.querySelector('img');
-    const titleEl    = bannerEl.querySelector('.banner-text h5');
-    const subtitleEl = bannerEl.querySelector('.banner-text small');
+          const imgEl = bannerEl.querySelector('img');
+          const titleEl = bannerEl.querySelector('.banner-text h5');
+          const subtitleEl = bannerEl.querySelector('.banner-text small');
 
-    // Filtra apenas eventos com imagem e limita a 8 slides
-    const slides = events
-      .filter(e => !!e.imagem)
-      .slice(0, 8)
-      .map(e => ({
-        src: e.imagem,
-        title: e.nome || 'Evento',
-        subtitle: [e.cidade, e.local].filter(Boolean).join(' - ')
-      }));
+          // Filtra apenas eventos com imagem e limita a 8 slides
+          const slides = events
+            .filter(e => !!e.imagem)
+            .slice(0, 8)
+            .map(e => ({
+              src: e.imagem,
+              title: e.nome || 'Evento',
+              subtitle: [e.cidade, e.local].filter(Boolean).join(' - ')
+            }));
 
-    if (!slides.length || !imgEl || !titleEl || !subtitleEl) return;
+          if (!slides.length || !imgEl || !titleEl || !subtitleEl) return;
 
-    // Pré-carrega as imagens para evitar "flash" na troca
-    slides.forEach(s => {
-      const pre = new Image();
-      pre.src = s.src;
-    });
+          // Pré-carrega as imagens para evitar "flash" na troca
+          slides.forEach(s => {
+            const pre = new Image();
+            pre.src = s.src;
+          });
 
-    let i = 0;
-    const INTERVAL_MS = 3000; // tempo entre slides
+          let i = 0;
+          const INTERVAL_MS = 3000; // tempo entre slides
 
-    /**
-     * Aplica os dados de um slide (imagem + textos) no DOM do banner.
-     */
-    function applySlide(s) {
-      imgEl.src = s.src;
-      imgEl.alt = s.title;
-      titleEl.textContent = s.title;
-      subtitleEl.textContent = s.subtitle;
-    }
+          /**
+           * Aplica os dados de um slide (imagem + textos) no DOM do banner.
+           */
+          function applySlide(s) {
+            imgEl.src = s.src;
+            imgEl.alt = s.title;
+            titleEl.textContent = s.title;
+            subtitleEl.textContent = s.subtitle;
+          }
 
-    // Inicia com o primeiro slide
-    applySlide(slides[i]);
+          // Inicia com o primeiro slide
+          applySlide(slides[i]);
 
-    // Timer para auto-avançar o slider
-    let timer = setInterval(nextSlide, INTERVAL_MS);
+          // Timer para auto-avançar o slider
+          let timer = setInterval(nextSlide, INTERVAL_MS);
 
-    function nextSlide() {
-      i = (i + 1) % slides.length;
-      applySlide(slides[i]);
-    }
-    function prevSlide() {
-      i = (i - 1 + slides.length) % slides.length;
-      applySlide(slides[i]);
-    }
-    function resetTimer() {
-      clearInterval(timer);
-      timer = setInterval(nextSlide, INTERVAL_MS);
-    }
+          function nextSlide() {
+            i = (i + 1) % slides.length;
+            applySlide(slides[i]);
+          }
+          function prevSlide() {
+            i = (i - 1 + slides.length) % slides.length;
+            applySlide(slides[i]);
+          }
+          function resetTimer() {
+            clearInterval(timer);
+            timer = setInterval(nextSlide, INTERVAL_MS);
+          }
 
-    /**
-     * Cria botão de navegação do slider (esquerda/direita) posicionado no banner.
-     */
-    function makeBtn(side, label, clickFn) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.setAttribute('aria-label', label);
-      Object.assign(b.style, {
-        position: 'absolute',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        [side]: '10px',
-        width: '40px',
-        height: '40px',
-        border: 'none',
-        borderRadius: '50%',
-        background: 'rgba(0,0,0,0.45)',
-        color: '#fff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        zIndex: '5'
-      });
-      b.innerHTML = side === 'left' ? '&larr;' : '&rarr;';
-      b.addEventListener('click', () => { clickFn(); resetTimer(); });
-      return b;
-    }
+          /**
+           * Cria botão de navegação do slider (esquerda/direita) posicionado no banner.
+           */
+          function makeBtn(side, label, clickFn) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.setAttribute('aria-label', label);
+            Object.assign(b.style, {
+              position: 'absolute',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              [side]: '10px',
+              width: '40px',
+              height: '40px',
+              border: 'none',
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: '5'
+            });
+            b.innerHTML = side === 'left' ? '&larr;' : '&rarr;';
+            b.addEventListener('click', () => { clickFn(); resetTimer(); });
+            return b;
+          }
 
-    const leftBtn  = makeBtn('left',  'Anterior', nextSlide);
-    const rightBtn = makeBtn('right', 'Próximo',  prevSlide);
-    bannerEl.append(leftBtn, rightBtn);
+          const leftBtn = makeBtn('left', 'Anterior', nextSlide);
+          const rightBtn = makeBtn('right', 'Próximo', prevSlide);
+          bannerEl.append(leftBtn, rightBtn);
 
-    // Acessibilidade: permite navegar no slider com setas do teclado
-    bannerEl.tabIndex = 0;
-    bannerEl.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft')  { prevSlide();  resetTimer(); }
-      if (e.key === 'ArrowRight') { nextSlide();  resetTimer(); }
-    });
-  }
+          // Acessibilidade: permite navegar no slider com setas do teclado
+          bannerEl.tabIndex = 0;
+          bannerEl.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') { prevSlide(); resetTimer(); }
+            if (e.key === 'ArrowRight') { nextSlide(); resetTimer(); }
+          });
+        }
 
-  /**
-   * Busca simples de texto: filtra eventos pelo que foi digitado
-   * (nome, cidade, local ou descrição).
-   */
-  if (searchEl) {
-    let t;
-    searchEl.addEventListener('input', () => {
-      clearTimeout(t);
-      t = setTimeout(() => {
-        const q = searchEl.value.trim().toLowerCase();
-        if (!q) return renderList(allEvents);
+        // LOGOUT FUNCTION
 
-        const filtered = allEvents.filter(e => {
-          const campos = [e.nome, e.cidade, e.local, e.descricao]
-            .map(v => (v || '').toLowerCase());
-          return campos.some(v => v.includes(q));
-        });
+        document.querySelector("#menu-logout").addEventListener('click', logout)
 
-        renderList(filtered);
-      }, 150); // debounce de 150ms evita chamadas excessivas
-    });
-  }
-})();
-</script>
+        async function logout() {
+          try {
+            const refresh = await localStorage.getItem("refresh");
+            const access = await localStorage.getItem("access");
+
+            const token = await getToken();
+      
+            const response = await fetch(`${API_BASE}/auth/logout/`, {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                refresh: refresh,
+              }),
+            })
+            if (response.status === 205) {
+              // MENSAGEM DE FEEDBACK
+            } else {
+              console.error(400)
+            }
+            window.location.href = 'login.html'
+            localStorage.removeItem("refresh")
+            localStorage.removeItem("access")
+            console.error(_)
+          } catch (_) {
+            console.error(_)
+          }
+        }
+
+        /**
+         * Busca simples de texto: filtra eventos pelo que foi digitado
+         * (nome, cidade, local ou descrição).
+         */
+        if (searchEl) {
+          let t;
+          searchEl.addEventListener('input', () => {
+            clearTimeout(t);
+            t = setTimeout(() => {
+              const q = searchEl.value.trim().toLowerCase();
+              if (!q) return renderList(allEvents);
+
+              const filtered = allEvents.filter(e => {
+                const campos = [e.nome, e.cidade, e.local, e.descricao]
+                  .map(v => (v || '').toLowerCase());
+                return campos.some(v => v.includes(q));
+              });
+
+              renderList(filtered);
+            }, 150); // debounce de 150ms evita chamadas excessivas
+          });
+        }
+      })();
+    </script>
 
 
 
-<script src="js/cart-badge.js"></script>
+    <script src="js/cart-badge.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </body>
+
 </html>
