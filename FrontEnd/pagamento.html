@@ -256,8 +256,7 @@
       <ul class="list-unstyled">
         <li><a href="index.html" class="text-white text-decoration-none d-block py-2">Eventos</a></li>
         <li><a href="sobre.html" class="text-white text-decoration-none d-block py-2">Sobre Nós</a></li>
-        <li><a href="#" class="text-white text-decoration-none d-block py-2">Conta</a></li>
-        <li><a href="#" class="text-white text-decoration-none d-block py-2">Sair</a></li>
+        <li><a id="menu-logout" class="text-white text-decoration-none d-block py-2">Sair</a></li>
       </ul>
       <div class="d-flex justify-content-start gap-4 mt-3">
         <a href="#" class="text-white fs-1"><i class="bi bi-instagram"></i></a>
@@ -521,7 +520,15 @@
   });
 </script>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // só checa se existe token; se não tiver, manda pro login
+    Auth.ensureAuthenticated({ checkServer: false });
+  });
+</script>
 
+<script src="js/auth.js"></script>
+<script src="js/logout.js"></script>
 <script src="js/cart-badge.js"></script>
 
 </body>
