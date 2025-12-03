@@ -1,0 +1,119 @@
+@startuml
+
+title Diagrama de Classes - Sistema de Venda de Ingressos e Excursões (FAROFA TRIP)
+
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+
+class Cliente {
+    - id: int (PK)
+    - nome: varchar(255)
+    - email: varchar(255)
+    - senha: varchar(255)
+    - telefone: varchar(20)
+
+    --
+    + cadastrar()
+    + login()
+    + consultarEventos()
+    + fazerReserva(eventoID, quantidade)
+    + comprar(vendaID)
+    + consultarHistorico()
+    + atualizarDados()
+}
+
+class Administrador {
+    - id: int (PK)
+    - nome_usuario: varchar(100)
+    - senha: varchar(255)
+
+    --
+    + login()
+    + gerenciarCliente()
+    + gerenciarEvento()
+    + gerenciarVendas()
+    + gerarRelatorio(tipo)
+}
+
+class Evento {
+    - id: int (PK)
+    - nome: varchar(255)
+    - descricao: varchar(1000)
+    - local: varchar(255)
+    - data_evento: datetime
+    - preco_ingresso: float
+    - quantidade_total_ingressos: int
+    - quantidade_ingressos_vendidos: int
+
+    --
+    + criarEvento()
+    + atualizarInformacoes()
+    + esgotarIngressos()
+    + validarIngresso(codigo)
+}
+
+class Excursao {
+    - id: int (PK)
+    - nome: varchar(255)
+    - descricao: varchar(500)
+    - local_saida: varchar(255)
+    - horario_saida: time
+    - preco_excursao: float
+    - vagas_total: int
+    - vagas_disponiveis: int
+    - evento_id: integer (FK)
+
+    --
+    + criarExcursao()
+    + atualizarVagas()
+    + cancelarExcursao()
+}
+
+class Venda {
+    - id: int (PK)
+    - valor_total: float
+    - data_venda: datetime
+    - forma_pagamento: enum
+    - status_pagamento: enum
+    - cliente_id: int (FK)
+
+    --
+    + processarPagamento()
+    + gerarIngressos()
+    + cancelarVenda()
+}
+
+class Ingresso {
+    - id: int (PK)
+    - codigo_ingresso: varchar(50)
+    - status: enum
+    - data_validacao: datetime
+    - venda_id: int (FK)
+    - evento_id: int (FK)
+
+    --
+    + gerarCodigo()
+    + atualizarStatus(novoStatus)
+}
+
+class ReservaExcursao {
+    - id: int (PK)
+    - cliente_id: integer (FK)
+    - excursao_id: integer (FK)
+    - data_reserva: datetime
+
+    --
+    + reservarVaga()
+    + cancelarReserva()
+}
+
+' Relacionamentos
+Cliente "1" -- "1..*" Venda : faz >
+Venda "1" -- "1..*" Ingresso : inclui >
+Ingresso "1..*" -- "1" Evento : para >
+Excursao "1..*" -- "1" Evento : para >
+Cliente "1..*" -- "1..*" Excursao
+(Cliente, Excursao) .. ReservaExcursao
+
+@enduml
